@@ -11,13 +11,4 @@ public abstract class Monster : MoveObject
     {
         chasing = _chasing;
     }
-
-    protected void Chase()
-    {
-        float dx = target.position.x - transform.position.x;
-        float dy = target.position.y - transform.position.y;
-        Vector3 vector = new Vector3(dx, dy);
-        vector.Normalize();
-        Move(vector);
-    }
 }

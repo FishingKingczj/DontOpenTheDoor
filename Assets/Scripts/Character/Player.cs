@@ -16,6 +16,14 @@ public class Player : MoveObject
     void OnTriggerEnter2D(Collider2D collider)
     {
         Debug.Log("你碰到了" + collider.name.ToString());
+        if (collider.tag.Equals("Door"))
+        {
+            GameObject room1 = GameObject.Find("Room1");
+            GameObject room2 = GameObject.Find("Room2");
+            room1.transform.position += new Vector3(0, 21, 0);
+            room2.transform.position += new Vector3(0, 21, 0);
+            transform.position += new Vector3(0, 21, 0);
+        }
     }
 
     // 接触结束
