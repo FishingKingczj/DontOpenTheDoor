@@ -1,4 +1,4 @@
-﻿using System;
+﻿  using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,4 +41,9 @@ public abstract class MoveObject : MonoBehaviour
     {
         moveSpeed = speed;
     }
+
+	// 返回角色移动速度
+	public float GetSpeed(){
+		return moveSpeed;
+	}
 }
