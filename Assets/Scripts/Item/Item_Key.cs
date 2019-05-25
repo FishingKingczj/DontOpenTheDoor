@@ -12,6 +12,7 @@ public class Item_Key : Item
 
     void Start()
     {
+        id = 1;
         name = "Key";
         description = "这是个钥匙";
 
@@ -30,7 +31,7 @@ public class Item_Key : Item
     {
         if (pickable == true)
         {
-            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, name, description,pairingValue))
+            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id ,name, description,pairingValue))
                 Destroy(this.gameObject);
             else
             {

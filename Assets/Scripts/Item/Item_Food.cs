@@ -9,6 +9,7 @@ public class Item_Food : Item
 
     void Start()
     {
+        id = 0;
         name = "Food";
         description = "这是一袋大米,恢复10点体力";
 

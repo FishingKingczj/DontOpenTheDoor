@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class Item : MonoBehaviour
 {
     [Header("Basic Infomation")]
+    public int id;
     public string name;
     public string description;
 
@@ -23,7 +24,7 @@ public class Item : MonoBehaviour
         //拾取类物品
         if (pickable == true)
         {
-            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, name, description))
+            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id ,name, description))
                 Destroy(this.gameObject);
             else {
                 Debug.Log("背包已满");
