@@ -146,6 +146,11 @@ public class RoomLoader : MonoBehaviour
         mainCamera.Move(target);
     }
 
+    public Room GetPlayerRoom()
+    {
+        return playerRoom;
+    }
+
     // 计算两个房间之间的图距离，不连通则返回-1
     public static int Distance(Room roomFrom, Room roomTo)
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MainCamera : MonoBehaviour
 {
-    public const float MOVE_SPEED = 20f;
+    public const float MOVE_SPEED = 40f;
 
     private Vector3 target;
     private RoomLoader loader;

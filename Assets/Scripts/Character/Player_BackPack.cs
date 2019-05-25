@@ -170,6 +170,9 @@ public class Player_BackPack : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.G))
             {
                 GameObject item = LoadItemToScene(item_Name[selectedIndex]);
+                // 需要把物体的加到Room里
+                Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
+                item.transform.parent = room.transform;
                 item.transform.position = this.gameObject.transform.position;
 
                 // 特殊处理

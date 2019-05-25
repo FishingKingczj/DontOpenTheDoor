@@ -102,6 +102,12 @@ public class Player : MoveObject
 
     // 控制玩家互动
     private void PlayerInteract() {
+        // 如果玩家正在使用物品，屏蔽地图交互
+        if (GetComponent<Player_BackPack>().inSelected)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);

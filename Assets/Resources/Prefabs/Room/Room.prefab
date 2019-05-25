@@ -120,6 +120,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50b512ad56e00ac4aa8bd110b8b8a28a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   name: 
   description: 
   pickable: 0
@@ -127,8 +128,8 @@ MonoBehaviour:
   usageTime: 0
   timer_UsageTime: 0
   progressRing: {fileID: 0}
-  locked: 0
-  open: 0
+  inLocked: 0
+  inOpened: 0
   pairingValue: 0
 --- !u!1 &2630681780880021688
 GameObject:
@@ -235,7 +236,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2630681780947982644
 Transform:
   m_ObjectHideFlags: 0
@@ -625,6 +626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50b512ad56e00ac4aa8bd110b8b8a28a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   name: 
   description: 
   pickable: 0
@@ -632,8 +634,8 @@ MonoBehaviour:
   usageTime: 0
   timer_UsageTime: 0
   progressRing: {fileID: 0}
-  locked: 0
-  open: 0
+  inLocked: 0
+  inOpened: 0
   pairingValue: 0
 --- !u!1 &2630681781426017301
 GameObject:
@@ -755,6 +757,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50b512ad56e00ac4aa8bd110b8b8a28a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   name: 
   description: 
   pickable: 0
@@ -762,8 +765,8 @@ MonoBehaviour:
   usageTime: 0
   timer_UsageTime: 0
   progressRing: {fileID: 0}
-  locked: 0
-  open: 0
+  inLocked: 0
+  inOpened: 0
   pairingValue: 0
 --- !u!1 &8988881153225332707
 GameObject:
@@ -885,6 +888,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50b512ad56e00ac4aa8bd110b8b8a28a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  id: 0
   name: 
   description: 
   pickable: 0
@@ -892,6 +896,6 @@ MonoBehaviour:
   usageTime: 0
   timer_UsageTime: 0
   progressRing: {fileID: 0}
-  locked: 0
-  open: 0
+  inLocked: 0
+  inOpened: 0
   pairingValue: 0

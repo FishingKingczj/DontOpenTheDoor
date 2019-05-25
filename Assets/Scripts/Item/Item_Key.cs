@@ -31,7 +31,7 @@ public class Item_Key : Item
     {
         if (pickable == true)
         {
-            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id ,name, description,pairingValue))
+            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id, name, description, pairingValue))
                 Destroy(this.gameObject);
             else
             {
@@ -55,7 +55,8 @@ public class Item_Key : Item
 
                         t.GetComponent<Item_Door>().Unlock();
                     }
-                    else {
+                    else
+                    {
                         Debug.Log("上锁成功");
 
                         t.GetComponent<Item_Door>().Lock();
@@ -75,8 +76,14 @@ public class Item_Key : Item
             {
                 if (t.tag == "Item_Door")
                 {
-                    if (!t.GetComponent<Item_Door>().Pair(pairingValue)) {
+                    if (!t.GetComponent<Item_Door>().Pair(pairingValue))
+                    {
                         Debug.Log("这钥匙不是开这里的");
+                        return;
+                    }
+                    if (t.GetComponent<Item_Door>().inOpened)
+                    {
+                        Debug.Log("门开着");
                         return;
                     }
 
