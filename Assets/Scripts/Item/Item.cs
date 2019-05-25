@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class Item : MonoBehaviour
 {
+    [Header("Basic Infomation")]
     public string name;
     public string description;
 
@@ -36,13 +37,14 @@ public class Item : MonoBehaviour
 
     // 使用效果
     public virtual void Effect(GameObject _user) { }
+
     // 使用和重设使用时间
     public virtual void Use(GameObject _user) {
         if (timer_UsageTime <= 0)
         {
             Effect(_user);
-            Use_Reset();
             _user.GetComponent<Player_BackPack>().UseSucceed();
+            Use_Reset();
         }
         else {
             timer_UsageTime -= Time.deltaTime;

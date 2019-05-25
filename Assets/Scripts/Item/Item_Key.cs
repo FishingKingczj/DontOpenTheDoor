@@ -7,6 +7,7 @@ public class Item_Key : Item
 {
     private const float DEFAULT_ENERGYRESTORE = 10.0f;
 
+    [Header("Additional Varible")]
     public int pairingValue;
 
     void Start()
@@ -45,8 +46,13 @@ public class Item_Key : Item
                 {
                     if(t.GetComponent<Item_Door>().Open(pairingValue))
                     _user.GetComponent<Player_BackPack>().UseSucceed();
+                    return;
                 }
             }
         }
     }
+
+    // 设置钥匙配对值
+    public void SetPairingValue(int _value) { pairingValue = _value; }
+    public int GetPairingValue() { return pairingValue; }
 }

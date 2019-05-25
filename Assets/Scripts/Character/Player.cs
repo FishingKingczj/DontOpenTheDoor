@@ -123,17 +123,18 @@ public class Player : MoveObject
                     {
                         if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
                         {
+                            dis = Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position);
                             item = colliders[i];
                         }
                     }
-
                 }
 
                 if (item == null) { return; }
-                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver); 
             }
         }
     }
+
     // 增加体力
     public void AddEnergy(float _value) {
         energy_Current += _value;

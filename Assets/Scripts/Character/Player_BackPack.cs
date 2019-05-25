@@ -15,10 +15,11 @@ public class Player_BackPack : MonoBehaviour
     public string[] item_Name;
     public string[] item_Description;
 
-    public bool selected = false;
+    [Header("Operation Vairable")]
+    public bool inSelected = false;
     public int selectedIndex = -1;
 
-    private float timer_UseItem;
+    public bool inUsed = false;
 
     void Start()
     {
@@ -42,14 +43,18 @@ public class Player_BackPack : MonoBehaviour
 
     void Update()
     {
-        SelectItem();
         UseItem();
+        if (!inUsed)
+        {
+            SelectItem();
+            DiscardItem();
+        }
     }
 
     private void OnGUI()
     {
         // 测试用 显示选择的物品信息
-        if (selected)
+        if (inSelected)
         {
             GUI.TextField(new Rect(Screen.width / 2.0f - (Screen.height / 1.5f / 2.0f), Screen.height / 9.5f, Screen.height / 1.5f, Screen.height / 8), item_Name[selectedIndex] + '\n' + item_Description[selectedIndex]);
         }
@@ -70,7 +75,7 @@ public class Player_BackPack : MonoBehaviour
         for (int j = 0; j < maxStorageAmount; j++) {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItem(_name);
+                GameObject item = LoadItemToBackpack(_name);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -92,7 +97,7 @@ public class Player_BackPack : MonoBehaviour
 
         return false;
     }
-    // 添加道具(针对key类道具)
+    // 添加道具(针对带特殊参数的key类道具)
     public bool AddItem(GameObject _item, int _maxStorageAmount, string _name, string _description,int _value)
     {
         // 尝试寻找空位置
@@ -100,7 +105,7 @@ public class Player_BackPack : MonoBehaviour
         {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItem(_name);
+                GameObject item = LoadItemToBackpack(_name);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -112,7 +117,10 @@ public class Player_BackPack : MonoBehaviour
                 item.GetComponent<RectTransform>().sizeDelta = new Vector2(width - 10, height - 10);
                 item.transform.SetAsFirstSibling();
 
-                item.GetComponent<Item_Key>().pairingValue = _value;
+                // 特殊物品处理
+                if (_name.Contains("Key")) {
+                    item.GetComponent<Item_Key>().pairingValue = _value;
+                }
 
                 item_Group[j] = item;
                 ReflashItemAmount(j, 1);
@@ -124,9 +132,10 @@ public class Player_BackPack : MonoBehaviour
 
         return false;
     }
-    //删除物品
+
+    // 删除物品
     public void RemoveItem(int _index) {
-        selected = false;
+        inSelected = false;
         selectedIndex = -1;
 
         Destroy(item_Group[_index]);
@@ -137,8 +146,27 @@ public class Player_BackPack : MonoBehaviour
         item_Description[_index] = null;
     }
 
-    // 加载物品
-    public GameObject LoadItem(string _name) {
+    // 丢弃物品(包含特殊处理)
+    public void DiscardItem() {
+        if (inSelected) {
+            if (Input.GetKeyDown(KeyCode.G))
+            {
+                GameObject item = LoadItemToScene(item_Name[selectedIndex]);
+                item.transform.position = this.gameObject.transform.position;
+
+                // 特殊处理
+                if (item_Name[selectedIndex].Contains("Key"))
+                {
+                    item.GetComponent<Item_Key>().SetPairingValue(item_Group[selectedIndex].GetComponent<Item_Key>().GetPairingValue());
+                }
+
+                ReflashItemAmount(selectedIndex, 0);
+            }
+        }
+    }
+
+    // 加载物品(生成到道具栏)
+    public GameObject LoadItemToBackpack(string _name) {
         switch (_name)
         {
             case "Food":
@@ -156,13 +184,34 @@ public class Player_BackPack : MonoBehaviour
         }
     }
 
+    // 加载物品(生成到场景)
+    public GameObject LoadItemToScene(string _name) {
+        switch (_name)
+        {
+            case "Food":
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Food"));
+                }
+            case "Key":
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Key"));
+                }
+            default:
+                {
+                    return null;
+                }
+        }
+    }
+
     // 使用物品
     public void UseItem() {
-        if (selected)
+        if (inSelected)
         {
             if (Input.GetKey(KeyCode.E)) {
+                inUsed = true;
                 item_Group[selectedIndex].SendMessage("Use", this.gameObject, SendMessageOptions.DontRequireReceiver);
-            } else if (Input.GetKeyUp(KeyCode.E)) { 
+            } else if (Input.GetKeyUp(KeyCode.E)) {
+                inUsed = false;
                 item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
             }
         }
@@ -171,6 +220,7 @@ public class Player_BackPack : MonoBehaviour
     // 物品使用成功
     public void UseSucceed()
     {
+        inUsed = false;
         ReflashItemAmount(selectedIndex, 0);
     }
 
@@ -201,58 +251,58 @@ public class Player_BackPack : MonoBehaviour
     public void SelectItem() {
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (selected) {
+            if (inSelected) {
                 item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
                 
                 if (item_Group[0] != null && selectedIndex != 0) {
                     selectedIndex = 0;
                     return;
                 }
-                selected = !selected; selectedIndex = -1;
+                inSelected = !inSelected; selectedIndex = -1;
             }
             else {
                 if (item_Group[0] == null) return;
 
-                selected = !selected;selectedIndex = 0;
+                inSelected = !inSelected;selectedIndex = 0;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if (selected) {
+            if (inSelected) {
                 item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
 
                 if (item_Group[1] != null && selectedIndex != 1) {
                     selectedIndex = 1;
                     return;
                 }
-                selected = !selected; selectedIndex = -1;
+                inSelected = !inSelected; selectedIndex = -1;
             }
             else {
                 if (item_Group[1] == null) return;
 
-                selected = !selected; selectedIndex = 1;
+                inSelected = !inSelected; selectedIndex = 1;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if (selected) {
+            if (inSelected) {
                 item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
 
                 if (item_Group[2] != null && selectedIndex != 2) {
                     selectedIndex = 2;
                     return;
                 }
-                selected = !selected; selectedIndex = -1;
+                inSelected = !inSelected; selectedIndex = -1;
             }
             else {
                 if (item_Group[2] == null) return;
 
-                selected = !selected; selectedIndex = 2;
+                inSelected = !inSelected; selectedIndex = 2;
             }
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            if (selected) {
+            if (inSelected) {
                 item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
 
                 if (item_Group[3] != null && selectedIndex != 3)
@@ -260,12 +310,12 @@ public class Player_BackPack : MonoBehaviour
                     selectedIndex = 3;
                     return;
                 }
-                selected = !selected; selectedIndex = -1;
+                inSelected = !inSelected; selectedIndex = -1;
             }
             else {
                 if (item_Group[3] == null) return;
 
-                selected = !selected; selectedIndex = 3;
+                inSelected = !inSelected; selectedIndex = 3;
             }
         }
     }

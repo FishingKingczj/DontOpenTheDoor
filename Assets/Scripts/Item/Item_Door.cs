@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Item_Door : Item
 {
+    [Header("Additional Varible")]
     public int pairingValue;
 
     void Start()
@@ -18,5 +19,4 @@ public class Item_Door : Item
         }
         return false;
     }
-
 }
