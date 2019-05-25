@@ -43,7 +43,7 @@ public class Item_Key : Item
             {
                 if (t.tag == "Item_Door")
                 {
-                    if(t.GetComponent<Item_Door>().Open(pairingValue))
+                    if(t.GetComponent<Item_Door>().Unlock(pairingValue))
                     _user.GetComponent<Player_BackPack>().UseSucceed();
                 }
             }

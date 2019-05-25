@@ -87,9 +87,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12d6da23ff58e6f41985a05cac609ab2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  description: 
   name: 
-  id: 0
+  description: 
   pickable: 0
-  storageAmount: 0
+  maxStorageAmount: 0
   usageTime: 0
+  timer_UsageTime: 0
+  progressRing: {fileID: 0}
