@@ -8,6 +8,7 @@ public class MainCamera : MonoBehaviour
 
     private Vector3 target;
     private RoomLoader loader;
+    private bool refresh;
 
     void Start()
     {
@@ -18,7 +19,7 @@ public class MainCamera : MonoBehaviour
     void Update()
     {
         transform.position = Vector3.MoveTowards(transform.position, target, MOVE_SPEED * Time.deltaTime);
-        if (transform.position.Equals(target))
+        if (transform.position.Equals(target) && refresh)
         {
             loader.InActiveRooms();
         }
@@ -27,5 +28,6 @@ public class MainCamera : MonoBehaviour
     public void Move(Vector3 _target)
     {
         target = _target + new Vector3(0, 0, -10);
+        refresh = true;
     }
 }

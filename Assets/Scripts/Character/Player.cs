@@ -112,22 +112,24 @@ public class Player : MoveObject
 
                 for (int i = 0; i < colliders.Length; i++)
                 {
-                    if (colliders[i].tag.Split('_')[0] != "Item")
+                    if (!colliders[i].tag.Contains("Item"))
                         continue;
                     else
                     {
                         if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
                         {
+                            dis = Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position);
                             item = colliders[i];
                         }
                     }
                 }
 
                 if (item == null) { return; }
-                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver); 
             }
         }
     }
+
     // 增加体力
     public void AddEnergy(float _value) {
         energy_Current += _value;

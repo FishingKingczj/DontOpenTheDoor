@@ -5,18 +5,19 @@ using UnityEngine;
 
 public class Item_Door : Item
 {
-    public bool locked = false;
-    public bool open = false;
+    [Header("Additional Varible")]
+    public bool inLocked = false;
+    public bool inOpened = false;
     public int pairingValue;
 
     private Item_Door connect;
-    private float MIN_DISTANCE = 1f;
+    private const float MIN_DISTANCE = 1f;
 
     void Start()
     {
         // TODO animate
         SpriteRenderer sr = gameObject.transform.GetComponent<SpriteRenderer>();
-        if (open)
+        if (inOpened)
         {
             sr.sprite = Resources.Load("Image/Item/door_open", typeof(Sprite)) as Sprite;
         }
@@ -27,76 +28,42 @@ public class Item_Door : Item
         pickable = false;
     }
 
-    public bool Lock(int _pairingValue)
+    // 锁门
+    public bool GetLock()
+    {
+        return inLocked;
+    }
+
+    public void Lock()
+    {
+        inLocked = connect.inLocked = true;
+    }
+
+    public void Unlock()
+    {
+        inLocked = connect.inLocked = false;
+    }
+
+    // 钥匙匹配
+    public bool Pair(int _pairingValue)
     {
         if (pairingValue == _pairingValue)
         {
-            // LOCK
             return true;
         }
         return false;
     }
 
-    public bool Unlock(int _pairingValue)
+    // 开关门
+    private void Open()
     {
-        if (pairingValue == _pairingValue)
-        {
-            Open(true);
-            return true;
-        }
-        return false;
-    }
-
-    private void Open(bool hasKey)
-    {
-        if (locked)
-        {
-            if (hasKey)
-            {
-                pairingValue = -1;
-            }
-            else
-            {
-                // TODO fail need key
-                Debug.Log("door locked");
-                return;
-            }
-        }
         SetOpen(true);
     }
 
-    private void Close(GameObject _user)
+    private void Close()
     {
-        if ((transform.position - _user.transform.position).sqrMagnitude > MIN_DISTANCE * MIN_DISTANCE)
-        {
-            SetOpen(false);
-        }
-    }
 
-    // 互动效果
-    public override void Interact(GameObject _user)
-    {
-        Debug.Log("Interact door");
-        if (GetOpen())
-        {
-            if (false)
-            {
-                // TODO monster attacking QTE
-            }
-            else
-            {
-                Close(_user);
-            }
-        }
-        else
-        {
-            Open(false);
-        }
-    }
-
-    public bool GetOpen()
-    {
-        return open;
+        SetOpen(false);
     }
 
     public void SetOpen(bool _open)
@@ -119,12 +86,40 @@ public class Item_Door : Item
 
         gameObject.GetComponent<BoxCollider2D>().isTrigger = _open;
         connect.GetComponent<BoxCollider2D>().isTrigger = _open;
-        open = connect.open = _open;
+        inOpened = connect.inOpened = _open;
     }
 
-    public void SetLock(bool _locked)
+    public bool GetOpen()
     {
-        locked = connect.locked = _locked;
+        return inOpened;
+    }
+
+    // 互动效果
+    public override void Interact(GameObject _user)
+    {
+        if (pickable == false)
+        {
+            if (GetLock())
+            {
+                Debug.Log("这门锁上了");
+            }
+            else
+            {
+                if (GetOpen())
+                {
+                    if (false)
+                    {
+                        // TODO monster attacking QTE
+                    }
+                    else if ((transform.position - _user.transform.position).sqrMagnitude > MIN_DISTANCE * MIN_DISTANCE)
+                        Close();
+                }
+                else
+                {
+                    Open();
+                }
+            }
+        }
     }
 
     public void SetConnect(Item_Door door)

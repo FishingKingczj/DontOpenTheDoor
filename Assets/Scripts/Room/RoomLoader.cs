@@ -59,28 +59,28 @@ public class RoomLoader : MonoBehaviour
         activeRooms.Add(center);
         center.transform.position = pos;
 
-        if (!activeRooms.Contains(center.up))
+        if (center.up && !activeRooms.Contains(center.up))
         {
             center.up.gameObject.SetActive(true);
             activeRooms.Add(center.up);
             center.up.transform.position = pos + new Vector3(0, UNIT_SIZE, 0);
         }
 
-        if (!activeRooms.Contains(center.down))
+        if (center.down && !activeRooms.Contains(center.down))
         {
             center.down.gameObject.SetActive(true);
             activeRooms.Add(center.down);
             center.down.transform.position = pos + new Vector3(0, -UNIT_SIZE, 0);
         }
 
-        if (!activeRooms.Contains(center.left))
+        if (center.left && !activeRooms.Contains(center.left))
         {
             center.left.gameObject.SetActive(true);
             activeRooms.Add(center.left);
             center.left.transform.position = pos + new Vector3(-UNIT_SIZE, 0, 0);
         }
 
-        if (!activeRooms.Contains(center.right))
+        if (center.right && !activeRooms.Contains(center.right))
         {
             center.right.gameObject.SetActive(true);
             activeRooms.Add(center.right);
