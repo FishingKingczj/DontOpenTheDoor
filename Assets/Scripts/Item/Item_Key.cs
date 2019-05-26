@@ -10,7 +10,7 @@ public class Item_Key : Item
     [Header("Additional Varible")]
     public int pairingValue;
 
-    void Start()
+    void Awake()
     {
         id = 1;
         name = "Key";

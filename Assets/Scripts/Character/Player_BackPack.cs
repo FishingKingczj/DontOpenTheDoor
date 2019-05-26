@@ -16,11 +16,16 @@ public class Player_BackPack : MonoBehaviour
     public string[] item_Name;
     public string[] item_Description;
 
+    public int numberOfItem;
+
     [Header("Operation Vairable")]
     public bool inSelected = false;
     public int selectedIndex = -1;
 
     public bool inUsed = false;
+
+    public bool inOperated = false;
+    public float operateDelayTime = 0.5f;
 
     [Header("Composite Vairable")]
     public string[] compositeTable;
@@ -30,8 +35,10 @@ public class Player_BackPack : MonoBehaviour
     public const float MULTIPLESELECTUSAGETIME = 1.0f;
     public float timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
 
-    public const float COMPOSEITEMUSAGETIME = 2.0f;
+    public const float COMPOSEITEMUSAGETIME = 1.0f;
     public float timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
+
+    public Image progressRing;
 
     void Start()
     {
@@ -44,6 +51,8 @@ public class Player_BackPack : MonoBehaviour
         item_Name = new string[maxStorageAmount];
         item_Description = new string[maxStorageAmount];
 
+        numberOfItem = 0;
+
         for (int i = 1; i <= maxStorageAmount; i++) {
             string n = "Box_" + i.ToString();
             backpack[i - 1] = GameObject.Find(n); 
@@ -53,6 +62,8 @@ public class Player_BackPack : MonoBehaviour
         foreach (GameObject t in backpack) {
             text_StorageAmount[j++] = t.GetComponentInChildren<Text>();
         }
+
+        progressRing = GameObject.Find("ProgressRing").GetComponent<Image>();
     }
 
     void Update()
@@ -91,7 +102,7 @@ public class Player_BackPack : MonoBehaviour
         for (int j = 0; j < maxStorageAmount; j++) {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItemToBackpack(_name);
+                GameObject item = LoadItemToBackpack(_id);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -108,6 +119,8 @@ public class Player_BackPack : MonoBehaviour
                 item_Id[j] = _id;
                 item_Name[j] = _name;
                 item_Description[j] = _description;
+
+                numberOfItem++;
                 return true;
             }
         }
@@ -122,7 +135,7 @@ public class Player_BackPack : MonoBehaviour
         {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItemToBackpack(_name);
+                GameObject item = LoadItemToBackpack(_id);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -144,6 +157,8 @@ public class Player_BackPack : MonoBehaviour
                 item_Id[j] = _id;
                 item_Name[j] = _name;
                 item_Description[j] = _description;
+
+                numberOfItem++;
                 return true;
             }
         }
@@ -162,6 +177,10 @@ public class Player_BackPack : MonoBehaviour
         item_StorageAmount[_index] = 0;
         item_Name[_index] = null;
         item_Description[_index] = null;
+
+        numberOfItem--;
+
+        ResetSelectedPrompt();
     }
 
     // 丢弃物品(包含特殊处理)
@@ -169,7 +188,7 @@ public class Player_BackPack : MonoBehaviour
         if (inSelected) {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                GameObject item = LoadItemToScene(item_Name[selectedIndex]);
+                GameObject item = LoadItemToScene(item_Id[selectedIndex]);
                 // 需要把物体的加到Room里
                 Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
                 item.transform.parent = room.transform;
@@ -187,14 +206,14 @@ public class Player_BackPack : MonoBehaviour
     }
 
     // 加载物品(生成到道具栏)
-    public GameObject LoadItemToBackpack(string _name) {
-        switch (_name)
+    public GameObject LoadItemToBackpack(int _id) {
+        switch (_id)
         {
-            case "Food":
+            case 0:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Food"));
                 }
-            case "Key":
+            case 1:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Key"));
                 }
@@ -206,14 +225,14 @@ public class Player_BackPack : MonoBehaviour
     }
 
     // 加载物品(生成到场景)
-    public GameObject LoadItemToScene(string _name) {
-        switch (_name)
+    public GameObject LoadItemToScene(int _id) {
+        switch (_id)
         {
-            case "Food":
+            case 0:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Food"));
                 }
-            case "Key":
+            case 1:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Key"));
                 }
@@ -228,10 +247,11 @@ public class Player_BackPack : MonoBehaviour
     public void UseItem() {
         if (inSelected)
         {
-            if (Input.GetKey(KeyCode.E)) {
+            if (Input.GetKey(KeyCode.E) && !inOperated) {
                 inUsed = true;
                 item_Group[selectedIndex].SendMessage("Use", this.gameObject, SendMessageOptions.DontRequireReceiver);
             } else if (Input.GetKeyUp(KeyCode.E)) {
+                inOperated = false;
                 inUsed = false;
                 item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
             }
@@ -241,27 +261,28 @@ public class Player_BackPack : MonoBehaviour
     // 物品使用成功
     public void UseSucceed()
     {
+        inOperated = true;
         inUsed = false;
         ReflashItemAmount(selectedIndex, 0);
     }
 
-    // 刷新物品数量 1->增加 0->减少
-    public void ReflashItemAmount(int _index,int _opr) {
+    // 刷新物品数量 _opr:1->增加 0->减少 数量默认减少1
+    public void ReflashItemAmount(int _index,int _opr ,int _amount = 1) {
         if (_opr == 1)
         {
-            item_StorageAmount[_index]++;
+            item_StorageAmount[_index] += _amount;
             if(item_StorageAmount[_index] >= 2)
                 text_StorageAmount[_index].text = item_StorageAmount[_index].ToString();
         }
         else {
-            item_StorageAmount[_index]--;
+            item_StorageAmount[_index] -= _amount;
             if (item_StorageAmount[_index] < 2)
                 text_StorageAmount[_index].text = null;
             else {
                 text_StorageAmount[_index].text = item_StorageAmount[_index].ToString();
             }
 
-            if (item_StorageAmount[_index] == 0) {
+            if (item_StorageAmount[_index] <= 0) {
                 RemoveItem(_index);
             }
         }
@@ -270,8 +291,8 @@ public class Player_BackPack : MonoBehaviour
 
     // 选择物品
     public void SelectItem() {
-        // 长按 进入/退出 选择模式
-        if (Input.GetKey(KeyCode.Alpha1) || Input.GetKey(KeyCode.Alpha2) || Input.GetKey(KeyCode.Alpha3) || Input.GetKey(KeyCode.Alpha4))
+        // 长按 进入/退出 选择模式(物品数量必须大于1)
+        if (numberOfItem > 1 && (Input.GetKey(KeyCode.Alpha1) || Input.GetKey(KeyCode.Alpha2) || Input.GetKey(KeyCode.Alpha3) || Input.GetKey(KeyCode.Alpha4)))
         {
             if (timer_MultipleSelectUsageTime <= 0)
             {
@@ -282,134 +303,100 @@ public class Player_BackPack : MonoBehaviour
                 else {
                     ExitMultipleSelectMode();
                 }
+
+                ResetTimer();
             }
             else
             {
+                // 延迟进度环
+                if (timer_MultipleSelectUsageTime <= (MULTIPLESELECTUSAGETIME - operateDelayTime))
+                {
+                    progressRing.fillAmount = ((MULTIPLESELECTUSAGETIME - operateDelayTime) - timer_MultipleSelectUsageTime) / (MULTIPLESELECTUSAGETIME - operateDelayTime);
+                }
                 timer_MultipleSelectUsageTime -= Time.deltaTime;
             }
         }
-        else {
-            timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
-        }
 
+        if (Input.GetKeyUp(KeyCode.Alpha1) || Input.GetKeyUp(KeyCode.Alpha2) || Input.GetKeyUp(KeyCode.Alpha3) || Input.GetKeyUp(KeyCode.Alpha4)) ResetTimer();
+        
+        // 选择单个物品
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (inMultipleSelected) {
-                if (multipleSelectIndex.Contains(0))
-                {
-                    multipleSelectIndex.Remove(0);
-                }
-                else {
-                    multipleSelectIndex.Add(0);
-                }
-                return;
-            }
-
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-                
-                if (item_Group[0] != null && selectedIndex != 0) {
-                    selectedIndex = 0;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[0] == null) return;
-
-                inSelected = !inSelected;selectedIndex = 0;
-            }
+            Selected(1);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if (inMultipleSelected)
-            {
-                if (multipleSelectIndex.Contains(1))
-                {
-                    multipleSelectIndex.Remove(1);
-                }
-                else
-                {
-                    multipleSelectIndex.Add(1);
-                }
-                return;
-            }
-
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-
-                if (item_Group[1] != null && selectedIndex != 1) {
-                    selectedIndex = 1;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[1] == null) return;
-
-                inSelected = !inSelected; selectedIndex = 1;
-            }
+            Selected(2);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if (inMultipleSelected)
-            {
-                if (multipleSelectIndex.Contains(2))
-                {
-                    multipleSelectIndex.Remove(2);
-                }
-                else
-                {
-                    multipleSelectIndex.Add(2);
-                }
-                return;
-            }
-
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-
-                if (item_Group[2] != null && selectedIndex != 2) {
-                    selectedIndex = 2;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[2] == null) return;
-
-                inSelected = !inSelected; selectedIndex = 2;
-            }
+            Selected(3);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            if (inMultipleSelected)
+            Selected(4);
+        }
+    }
+
+    // 选中物品
+    public void Selected(int _index) 
+    {
+        //多选时 选择
+        if (inMultipleSelected && item_Group[_index - 1] != null)
+        {
+            if (multipleSelectIndex.Contains(_index - 1))
             {
-                if (multipleSelectIndex.Contains(3))
-                {
-                    multipleSelectIndex.Remove(3);
-                }
-                else
-                {
-                    multipleSelectIndex.Add(3);
-                }
+                // 暂用 取消多选选中提示
+                backpack[_index - 1].GetComponent<Image>().color = Color.white;
+
+                multipleSelectIndex.Remove(_index - 1);
+            }
+            else
+            {
+                // 暂用 多选选中提示
+                backpack[_index - 1].GetComponent<Image>().color = Color.blue;
+
+                multipleSelectIndex.Add(_index - 1);
+            }
+            return;
+        }
+
+        // 单选时重设选择提示
+        ResetSelectedPrompt();
+
+        //单选时选择
+        if (inSelected)
+        {
+            item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
+
+            if (item_Group[_index - 1] != null && selectedIndex != _index - 1)
+            {
+                selectedIndex = _index - 1;
+
+                // 暂用 UI选中提示
+                backpack[_index - 1].GetComponent<Image>().color = Color.red;
                 return;
             }
+            inSelected = !inSelected; selectedIndex = -1;
 
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
+            // 暂用 UI取消选中提示
+            backpack[_index - 1].GetComponent<Image>().color = Color.white;
+        }
+        else
+        {
+            if (item_Group[_index - 1] == null) return;
 
-                if (item_Group[3] != null && selectedIndex != 3)
-                {
-                    selectedIndex = 3;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[3] == null) return;
+            inSelected = !inSelected; selectedIndex = _index - 1;
 
-                inSelected = !inSelected; selectedIndex = 3;
-            }
+            // 暂用 UI选择提示
+            backpack[_index - 1].GetComponent<Image>().color = Color.red;
+        }
+    }
+
+    // 重设所有选中提示
+    public void ResetSelectedPrompt() {
+        for (int i = 0; i < maxStorageAmount; i++) {
+            backpack[i].GetComponent<Image>().color = Color.white;
         }
     }
 
@@ -423,6 +410,8 @@ public class Player_BackPack : MonoBehaviour
         {
             if (timer_ComposeItemUsageTime <= 0)
             {
+                ResetTimer();
+
                 // 检索合成表
                 string compositeInfo = null;
 
@@ -510,7 +499,7 @@ public class Player_BackPack : MonoBehaviour
                     return;
                 }
 
-                // 开始检测量检测
+                // 开始数量检测
                 string[] amount = compositeInfo.Split(' ');
                 for (int i = 0; i < amount.Length - 1; i++)
                 {
@@ -532,32 +521,74 @@ public class Player_BackPack : MonoBehaviour
                     }
                 }
 
-                //TODO Create new item and delete stuff
-                Debug.Log("合成成功 结果:" + amount[2].Split('=')[0] + " 数量: " + amount[2].Split('=')[1]);
-                ExitMultipleSelectMode();
+                // 消耗材料合成
+                for (int i = 0; i < amount.Length - 1; i++)
+                {
+                    int itemId = int.Parse(amount[i].Split('-')[0]);
+                    int itemAmount = int.Parse(amount[i].Split('-')[1]);
 
+                    for (int j = 0; j < multipleSelectIndex.Count; j++)
+                    {
+                        if (item_Id[multipleSelectIndex[j]] != itemId) continue;
+                        ReflashItemAmount(multipleSelectIndex[j], 0, itemAmount);
+                        break;
+                    }
+                }
+
+                // 生成合成物品(临时使用Key代替)
+                Debug.Log("合成成功 结果:" + amount[2].Split('=')[0] + " 数量: " + amount[2].Split('=')[1]);
+
+                for (int i = 0; i < int.Parse(amount[2].Split('=')[1]); i++)
+                {
+                    GameObject item = LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
+                    Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
+                    item.transform.parent = room.transform;
+                    item.transform.position = this.gameObject.transform.position;
+
+                    item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                }
+
+                ExitMultipleSelectMode();
             }
             else {
+                // 延迟进度环
+                if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME - operateDelayTime))
+                {
+                    progressRing.fillAmount = ((COMPOSEITEMUSAGETIME - operateDelayTime) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME - operateDelayTime);
+                }
                 timer_ComposeItemUsageTime -= Time.deltaTime;
             }
         }
 
-        if (Input.GetKeyUp(KeyCode.E)) { timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME; }
+        if (Input.GetKeyUp(KeyCode.E)) { ResetTimer(); }
     }
 
     // 进入\退出 多选择模式
     public void EnterMultipleSelectMode() {
         inMultipleSelected = true;
+
+        ResetSelectedPrompt();
+        ResetTimer();
+
+        //将单选的选项转移至多选中
+        if (inSelected) {
+            Selected(selectedIndex + 1);
+        }
+
         inSelected = false;
         selectedIndex = -1;
-
-        timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
-        timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
     }
     public void ExitMultipleSelectMode() {
         multipleSelectIndex.Clear();
         inMultipleSelected = false;
 
+        ResetSelectedPrompt();
+        ResetTimer();
+    }
+
+    // 重设定时器
+    private void ResetTimer() {
+        progressRing.fillAmount = 0;
         timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
         timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
     }

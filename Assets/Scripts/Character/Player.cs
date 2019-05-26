@@ -18,7 +18,7 @@ public class Player : MoveObject
 	public Slider energy_Slider;
 
     [Header("Interact varible")]
-    public float interaction_Range = 0.5f;
+    public float interaction_Range = 1.2f;
 
     private const float DEFAULT_SPEED = 1f;
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
@@ -52,15 +52,6 @@ public class Player : MoveObject
         if (collider != null)
         {
             //Debug.Log("你离开了" + collider.name.ToString());
-        }
-    }
-
-    //接触道具
-    private void OnTriggerStay2D(Collider2D collider)
-    {
-        if (collider.tag != "Item")
-        {
-            return;
         }
     }
 
@@ -103,7 +94,7 @@ public class Player : MoveObject
     // 控制玩家互动
     private void PlayerInteract() {
         // 如果玩家正在使用物品，屏蔽地图交互
-        if (GetComponent<Player_BackPack>().inSelected)
+        if (GetComponent<Player_BackPack>().inSelected || GetComponent<Player_BackPack>().inMultipleSelected)
         {
             return;
         }

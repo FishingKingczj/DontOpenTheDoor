@@ -13,7 +13,7 @@ public class Item_Door : Item
     private Item_Door connect;
     private const float MIN_DISTANCE = 1f;
 
-    void Start()
+    void Awake()
     {
         // TODO animate
         SpriteRenderer sr = gameObject.transform.GetComponent<SpriteRenderer>();
