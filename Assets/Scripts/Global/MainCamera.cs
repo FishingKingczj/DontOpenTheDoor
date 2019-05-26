@@ -22,6 +22,7 @@ public class MainCamera : MonoBehaviour
         if (transform.position.Equals(target) && refresh)
         {
             loader.InActiveRooms();
+            loader.ActiveAroundRoom();
         }
     }
 

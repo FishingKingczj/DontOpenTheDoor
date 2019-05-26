@@ -24,9 +24,9 @@ public class Player : MoveObject
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
 
 	void Start(){
-        CircleCollider2D box = gameObject.AddComponent<CircleCollider2D>();
-        box.radius = interaction_Range;
-        box.isTrigger = true;
+        //CircleCollider2D box = gameObject.AddComponent<CircleCollider2D>();
+        //box.radius = interaction_Range;
+        //box.isTrigger = true;
 
         energy_Slider = GameObject.Find("slider_Energy").GetComponent<Slider>();
 	}

@@ -35,10 +35,14 @@ public class RoomLoader : MonoBehaviour
             }
         }
 
+        // 这里需要执行两次，先设定门的状态
         foreach (Room room in allRooms)
         {
-            Debug.Log("Check" + room.name);
             room.CheckRoom();
+        }
+
+        foreach (Room room in allRooms)
+        {
             room.CheckDoor();
         }
 
@@ -48,43 +52,41 @@ public class RoomLoader : MonoBehaviour
             Debug.LogError("未设置出生房间");
         }
 
-        ActiveAroundRoom(playerRoom, new Vector3(0, 0, 0));
+        ActiveRoom(playerRoom, new Vector3(0, 0, 0));
+        ActiveAroundRoom();
     }
 
-    // 激活某个房间周围的所有房间
-    private void ActiveAroundRoom(Room center, Vector3 pos)
+    // 激活某个房间
+    private void ActiveRoom(Room center, Vector3 pos)
     {
         Debug.Log("Active" + center.name);
         center.gameObject.SetActive(true);
         activeRooms.Add(center);
         center.transform.position = pos;
+    }
 
-        if (center.up && !activeRooms.Contains(center.up))
+    // 激活主房间周围的所有房间
+    public void ActiveAroundRoom()
+    {
+        Vector3 pos = playerRoom.transform.position;
+        if (playerRoom.up && !activeRooms.Contains(playerRoom.up))
         {
-            center.up.gameObject.SetActive(true);
-            activeRooms.Add(center.up);
-            center.up.transform.position = pos + new Vector3(0, UNIT_SIZE, 0);
+            ActiveRoom(playerRoom.up, pos + new Vector3(0, UNIT_SIZE, 0));
         }
 
-        if (center.down && !activeRooms.Contains(center.down))
+        if (playerRoom.down && !activeRooms.Contains(playerRoom.down))
         {
-            center.down.gameObject.SetActive(true);
-            activeRooms.Add(center.down);
-            center.down.transform.position = pos + new Vector3(0, -UNIT_SIZE, 0);
+            ActiveRoom(playerRoom.down, pos + new Vector3(0, -UNIT_SIZE, 0));
         }
 
-        if (center.left && !activeRooms.Contains(center.left))
+        if (playerRoom.left && !activeRooms.Contains(playerRoom.left))
         {
-            center.left.gameObject.SetActive(true);
-            activeRooms.Add(center.left);
-            center.left.transform.position = pos + new Vector3(-UNIT_SIZE, 0, 0);
+            ActiveRoom(playerRoom.left, pos + new Vector3(-UNIT_SIZE, 0, 0));
         }
 
-        if (center.right && !activeRooms.Contains(center.right))
+        if (playerRoom.right && !activeRooms.Contains(playerRoom.right))
         {
-            center.right.gameObject.SetActive(true);
-            activeRooms.Add(center.right);
-            center.right.transform.position = pos + new Vector3(UNIT_SIZE, 0, 0);
+            ActiveRoom(playerRoom.right, pos + new Vector3(UNIT_SIZE, 0, 0));
         }
     }
 
@@ -141,7 +143,7 @@ public class RoomLoader : MonoBehaviour
         // 更新玩家位置
         playerRoom = room;
         // 激活房间
-        ActiveAroundRoom(room, target);
+        ActiveRoom(room, target);
         // 移动镜头
         mainCamera.Move(target);
     }

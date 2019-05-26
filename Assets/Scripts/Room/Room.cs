@@ -10,6 +10,11 @@ public class Room : MonoBehaviour
     public Room left;
     public Room right;
 
+    private Item_Door doorUp;
+    private Item_Door doorDown;
+    private Item_Door doorLeft;
+    private Item_Door doorRight;
+
     void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.tag.Equals("Player"))
@@ -19,84 +24,83 @@ public class Room : MonoBehaviour
         }
     }
 
-
+    // 检查房间的连接，关闭不存在的门
     public void CheckRoom()
     {
-        if (up && up.down != this)
+        // 初始化门
+        doorUp = transform.Find("DoorUp").GetComponent<Item_Door>();
+        doorDown = transform.Find("DoorDown").GetComponent<Item_Door>();
+        doorLeft = transform.Find("DoorLeft").GetComponent<Item_Door>();
+        doorRight = transform.Find("DoorRight").GetComponent<Item_Door>();
+
+        if (!up)
         {
-            Debug.LogError("房间" + up.name + "上方连接，" + name + "有误");
+            doorUp.Disable();
         }
-        if (down && down.up != this)
+        if (!down)
         {
-            Debug.LogError("房间" + down.name + "下方连接，" + name + "有误");
+            doorDown.Disable();
         }
-        if (left && left.right != this)
+        if (!left)
         {
-            Debug.LogError("房间" + left.name + "左方连接，" + name + "有误");
+            doorLeft.Disable();
         }
-        if (right && right.left != this)
+        if (!right)
         {
-            Debug.LogError("房间" + right.name + "右方连接，" + name + "有误");
+            doorRight.Disable();
         }
     }
 
     public void CheckDoor()
     {
-        Item_Door door_up = transform.Find("DoorUp").GetComponent<Item_Door>();
-        if (!up)
-            door_up.enabled = door_up.GetComponent<Renderer>().enabled = false;
-        else
+        if (up)
         {
-            Item_Door another = up.transform.Find("DoorDown").GetComponent<Item_Door>();
-            InitDoor(door_up, another);
+            Item_Door upConnect = up.transform.Find("DoorDown").GetComponent<Item_Door>();
+            LinkDoor(doorUp, upConnect);
         }
 
-        Item_Door door_down = transform.Find("DoorDown").GetComponent<Item_Door>();
-        if (!down)
-            door_down.enabled = door_down.GetComponent<Renderer>().enabled = false;
-        else
+        if (down)
         {
-            Item_Door another = down.transform.Find("DoorUp").GetComponent<Item_Door>();
-            InitDoor(door_down, another);
+            Item_Door downConnect = transform.Find("DoorUp").GetComponent<Item_Door>();
+            LinkDoor(doorDown, downConnect);
         }
 
-        Item_Door door_left = transform.Find("DoorLeft").GetComponent<Item_Door>();
-        if (!left)
-            door_left.enabled = door_left.GetComponent<Renderer>().enabled = false;
-        else
+        if (left)
         {
-            Item_Door another = left.transform.Find("DoorRight").GetComponent<Item_Door>();
-            InitDoor(door_left, another);
+            Item_Door leftConnect = left.transform.Find("DoorRight").GetComponent<Item_Door>();
+            LinkDoor(doorLeft, leftConnect);
         }
 
-        Item_Door door_right = transform.Find("DoorRight").GetComponent<Item_Door>();
-        if (!right)
-            door_right.enabled = door_right.GetComponent<Renderer>().enabled = false;
-        else
+        if (right)
         {
-            Item_Door another = right.transform.Find("DoorLeft").GetComponent<Item_Door>();
-            InitDoor(door_right, another);
+            Item_Door reghtConnect = right.transform.Find("DoorLeft").GetComponent<Item_Door>();
+            LinkDoor(doorRight, reghtConnect);
         }
     }
 
-    public void InitDoor(Item_Door door1, Item_Door door2)
+    public void LinkDoor(Item_Door door1, Item_Door door2)
     {
-        if (door1.GetLock() != door2.GetLock())
+        Debug.Log(door1.name);
+        if (!door2.enabled)
         {
-            door1.inLocked = door2.inLocked = door2.inLocked && door2.inLocked;
-            Debug.LogWarning("房间" + name + "门" + door1.name + "锁连接有误");
+            Debug.LogError("房间" + name + "门" + door1.name + "对面没有门！");
         }
-        if (door1.GetOpen() != door2.GetOpen())
+        else
         {
-            door1.inOpened = door2.inOpened = door2.inOpened && door2.inOpened;
-            Debug.LogWarning("房间" + name + "门" + door1.name + "开关连接有误");
+            if (door1.GetLock() != door2.GetLock())
+            {
+                Debug.LogError("房间" + name + "门" + door1.name + "锁设置不一致");
+            }
+            if (door1.GetOpen() != door2.GetOpen())
+            {
+                Debug.LogError("房间" + name + "门" + door1.name + "开关设置不一致");
+            }
+            if (door1.pairingValue != door2.pairingValue)
+            {
+                Debug.LogError("房间" + name + "门" + door1.name + "钥匙设置不一致");
+            }
+            // 单向连接
+            door1.SetConnect(door2);
         }
-        if (door1.pairingValue != door2.pairingValue)
-        {
-            door1.pairingValue = door2.pairingValue;
-            Debug.LogError("房间" + name + "门" + door1.name + "钥匙连接有误");
-        }
-        door1.SetConnect(door2);
-        door2.SetConnect(door1);
     }
 }

@@ -106,7 +106,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 5.5, y: 4.5}
+  m_Size: {x: 5.5, y: 4}
   m_EdgeRadius: 0
 --- !u!114 &2630681780745084997
 MonoBehaviour:
@@ -131,6 +131,9 @@ MonoBehaviour:
   inLocked: 0
   inOpened: 0
   pairingValue: 0
+  direction: up
+  nextDoor: {fileID: 0}
+  lastDoor: {fileID: 0}
 --- !u!1 &2630681780880021688
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,7 +239,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &2630681780947982644
 Transform:
   m_ObjectHideFlags: 0
@@ -612,7 +615,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 4.5, y: 5.5}
+  m_Size: {x: 4, y: 5.5}
   m_EdgeRadius: 0
 --- !u!114 &2630681781149355861
 MonoBehaviour:
@@ -637,6 +640,9 @@ MonoBehaviour:
   inLocked: 0
   inOpened: 0
   pairingValue: 0
+  direction: right
+  nextDoor: {fileID: 0}
+  lastDoor: {fileID: 0}
 --- !u!1 &2630681781426017301
 GameObject:
   m_ObjectHideFlags: 0
@@ -743,7 +749,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 4.5, y: 5.5}
+  m_Size: {x: 4, y: 5.5}
   m_EdgeRadius: 0
 --- !u!114 &2630681781426017307
 MonoBehaviour:
@@ -768,6 +774,9 @@ MonoBehaviour:
   inLocked: 0
   inOpened: 0
   pairingValue: 0
+  direction: left
+  nextDoor: {fileID: 0}
+  lastDoor: {fileID: 0}
 --- !u!1 &8988881153225332707
 GameObject:
   m_ObjectHideFlags: 0
@@ -874,7 +883,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 5.5, y: 4.5}
+  m_Size: {x: 5.5, y: 4}
   m_EdgeRadius: 0
 --- !u!114 &8457027024784328165
 MonoBehaviour:
@@ -899,3 +908,6 @@ MonoBehaviour:
   inLocked: 0
   inOpened: 0
   pairingValue: 0
+  direction: down
+  nextDoor: {fileID: 0}
+  lastDoor: {fileID: 0}

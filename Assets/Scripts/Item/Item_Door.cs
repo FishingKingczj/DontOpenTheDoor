@@ -10,7 +10,11 @@ public class Item_Door : Item
     public bool inOpened = false;
     public int pairingValue;
 
-    private Item_Door connect;
+    // 内部测试变量
+    [Header("Test Varible")]
+    public string direction;
+    public Item_Door nextDoor;
+    public Item_Door lastDoor;
     private const float MIN_DISTANCE = 1f;
 
     void Start()
@@ -36,12 +40,23 @@ public class Item_Door : Item
 
     public void Lock()
     {
-        inLocked = connect.inLocked = true;
+        SetLocked(true);
     }
 
     public void Unlock()
     {
-        inLocked = connect.inLocked = false;
+        SetLocked(false);
+    }
+
+    private void SetLocked(bool _lock)
+    {
+        if (inLocked != _lock)
+        {
+            inLocked = _lock;
+            nextDoor.SetLocked(_lock);
+            if (lastDoor)
+                lastDoor.SetLocked(_lock);
+        }
     }
 
     // 钥匙匹配
@@ -68,25 +83,28 @@ public class Item_Door : Item
 
     public void SetOpen(bool _open)
     {
-        SpriteRenderer sr = gameObject.transform.GetComponent<SpriteRenderer>();
-        SpriteRenderer cnsr = connect.gameObject.transform.GetComponent<SpriteRenderer>();
-        Sprite sprite;
-        if (_open)
+        if (inOpened != _open)
         {
-            // TODO animation
-            sprite = Resources.Load("Image/Item/door_open", typeof(Sprite)) as Sprite;
-        }
-        else
-        {
-            // TODO animation
-            sprite = Resources.Load("Image/Item/door", typeof(Sprite)) as Sprite;
-        }
-        sr.sprite = sprite;
-        cnsr.sprite = sprite;
+            SpriteRenderer sr = gameObject.transform.GetComponent<SpriteRenderer>();
+            Sprite sprite;
+            if (_open)
+            {
+                // TODO animation
+                sprite = Resources.Load("Image/Item/door_open", typeof(Sprite)) as Sprite;
+            }
+            else
+            {
+                // TODO animation
+                sprite = Resources.Load("Image/Item/door", typeof(Sprite)) as Sprite;
+            }
+            sr.sprite = sprite;
 
-        gameObject.GetComponent<BoxCollider2D>().isTrigger = _open;
-        connect.GetComponent<BoxCollider2D>().isTrigger = _open;
-        inOpened = connect.inOpened = _open;
+            gameObject.GetComponent<BoxCollider2D>().isTrigger = _open;
+            inOpened = _open;
+            nextDoor.SetOpen(_open);
+            if (lastDoor)
+                lastDoor.SetOpen(_open);
+        }
     }
 
     public bool GetOpen()
@@ -111,8 +129,13 @@ public class Item_Door : Item
                     {
                         // TODO monster attacking QTE
                     }
-                    else if ((transform.position - _user.transform.position).sqrMagnitude > MIN_DISTANCE * MIN_DISTANCE)
-                        Close();
+                    // 和门之间的距离
+                    else
+                    {
+                        Debug.Log((transform.position - _user.transform.position).sqrMagnitude);
+                        if ((transform.position - _user.transform.position).sqrMagnitude > MIN_DISTANCE * MIN_DISTANCE)
+                            Close();
+                    }
                 }
                 else
                 {
@@ -124,6 +147,13 @@ public class Item_Door : Item
 
     public void SetConnect(Item_Door door)
     {
-        connect = door;
+        nextDoor = door;
+        door.lastDoor = this;
+    }
+
+    public void Disable()
+    {
+        enabled = false;
+        GetComponent<Renderer>().enabled = false;
     }
 }
