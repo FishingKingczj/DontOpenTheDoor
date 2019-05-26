@@ -53,12 +53,14 @@ public class Item_Key : Item
                     {
                         Debug.Log("开锁成功");
 
+                        _user.GetComponent<Player_BackPack>().UseSucceed(false);
                         t.GetComponent<Item_Door>().Unlock();
                     }
                     else
                     {
                         Debug.Log("上锁成功");
 
+                        _user.GetComponent<Player_BackPack>().UseSucceed(false);
                         t.GetComponent<Item_Door>().Lock();
                     }
                     return;

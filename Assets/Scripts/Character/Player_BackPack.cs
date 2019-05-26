@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Player_BackPack : MonoBehaviour
 {
@@ -258,11 +259,13 @@ public class Player_BackPack : MonoBehaviour
         }
     }
 
-    // 物品使用成功
-    public void UseSucceed()
+    // 物品使用成功 (是否消耗当前物品)
+    public void UseSucceed(bool _delete = true)
     {
         inOperated = true;
         inUsed = false;
+
+        if(_delete)
         ReflashItemAmount(selectedIndex, 0);
     }
 
