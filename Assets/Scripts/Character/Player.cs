@@ -24,7 +24,11 @@ public class Player : MoveObject
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
 
 	void Start(){
-		energy_Slider = GameObject.Find("slider_Energy").GetComponent<Slider>();
+        //CircleCollider2D box = gameObject.AddComponent<CircleCollider2D>();
+        //box.radius = interaction_Range;
+        //box.isTrigger = true;
+
+        energy_Slider = GameObject.Find("slider_Energy").GetComponent<Slider>();
 	}
 
     void FixedUpdate()
@@ -39,16 +43,7 @@ public class Player : MoveObject
 
     void OnTriggerEnter2D(Collider2D collider)
     {
-        Debug.Log("你碰到了" + collider.name.ToString());
-
-        if (collider.tag.Equals("Door"))
-        {
-            GameObject room1 = GameObject.Find("Room1");
-            GameObject room2 = GameObject.Find("Room2");
-            room1.transform.position += new Vector3(0, 21, 0);
-            room2.transform.position += new Vector3(0, 21, 0);
-            transform.position += new Vector3(0, 21, 0);
-        }
+        //Debug.Log("你碰到了" + collider.name.ToString());
     }
 
     // 接触结束
@@ -56,7 +51,7 @@ public class Player : MoveObject
     {
         if (collider != null)
         {
-            Debug.Log("你离开了" + collider.name.ToString());
+            //Debug.Log("你离开了" + collider.name.ToString());
         }
     }
 
@@ -107,6 +102,12 @@ public class Player : MoveObject
 
     // 控制玩家互动
     private void PlayerInteract() {
+        // 如果玩家正在使用物品，屏蔽地图交互
+        if (GetComponent<Player_BackPack>().inSelected)
+        {
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.E))
         {
             Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
@@ -117,23 +118,24 @@ public class Player : MoveObject
 
                 for (int i = 0; i < colliders.Length; i++)
                 {
-                    if (colliders[i].tag != "Item")
+                    if (!colliders[i].tag.Contains("Item"))
                         continue;
                     else
                     {
                         if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
                         {
+                            dis = Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position);
                             item = colliders[i];
                         }
                     }
-
                 }
 
                 if (item == null) { return; }
-                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver); 
             }
         }
     }
+
     // 增加体力
     public void AddEnergy(float _value) {
         energy_Current += _value;
