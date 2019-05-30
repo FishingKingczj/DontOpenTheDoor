@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Monster : MoveObject
+public abstract class Monster2 : MoveObject
 {
     protected Transform target;
     protected bool chasing;

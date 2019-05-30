@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MonsterA : Monster
+public class MonsterA : Monster2
 {
     private const float DEFAULT_SPEED = 0.8f;
 
