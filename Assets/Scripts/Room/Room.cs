@@ -61,7 +61,7 @@ public class Room : MonoBehaviour
 
         if (down)
         {
-            Item_Door downConnect = transform.Find("DoorUp").GetComponent<Item_Door>();
+            Item_Door downConnect = down.transform.Find("DoorUp").GetComponent<Item_Door>();
             LinkDoor(doorDown, downConnect);
         }
 
@@ -73,31 +73,31 @@ public class Room : MonoBehaviour
 
         if (right)
         {
-            Item_Door reghtConnect = right.transform.Find("DoorLeft").GetComponent<Item_Door>();
-            LinkDoor(doorRight, reghtConnect);
+            Item_Door rightConnect = right.transform.Find("DoorLeft").GetComponent<Item_Door>();
+            LinkDoor(doorRight, rightConnect);
         }
     }
 
     public void LinkDoor(Item_Door door1, Item_Door door2)
     {
-        Debug.Log(door1.name);
+        Debug.Log(door1.direction);
         if (!door2.enabled)
         {
-            Debug.LogError("房间" + name + "门" + door1.name + "对面没有门！");
+            Debug.LogError("房间" + name + "门" + door1.direction + "对面没有门！");
         }
         else
         {
             if (door1.GetLock() != door2.GetLock())
             {
-                Debug.LogError("房间" + name + "门" + door1.name + "锁设置不一致");
+                Debug.LogError("房间" + name + "门" + door1.direction + "锁设置不一致");
             }
             if (door1.GetOpen() != door2.GetOpen())
             {
-                Debug.LogError("房间" + name + "门" + door1.name + "开关设置不一致");
+                Debug.LogError("房间" + name + "门" + door1.direction + "开关设置不一致");
             }
             if (door1.pairingValue != door2.pairingValue)
             {
-                Debug.LogError("房间" + name + "门" + door1.name + "钥匙设置不一致");
+                Debug.LogError("房间" + name + "门" + door1.direction + "钥匙设置不一致");
             }
             // 单向连接
             door1.SetConnect(door2);
