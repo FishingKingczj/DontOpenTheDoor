@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Player : MoveObject
 {
@@ -20,6 +21,9 @@ public class Player : MoveObject
     [Header("Interact varible")]
     public float interaction_Range = 1.2f;
 
+    [Header("Movement varible")]
+    public bool inMoved = false;
+
     private const float DEFAULT_SPEED = 1f;
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
 
@@ -33,12 +37,9 @@ public class Player : MoveObject
 
     void FixedUpdate()
     {
-		if(energy_Current > 0)
-		{
-			PlayerRush();
-			PlayerMove();
-            PlayerInteract();
-		}
+        //PlayerRush(); //移动端注释 电脑端保留
+        //PlayerMove(); //移动端注释 电脑端保留
+        PlayerInteract();
     }
 
     void OnTriggerEnter2D(Collider2D collider)
@@ -58,6 +59,8 @@ public class Player : MoveObject
     // 控制人物移动
     private void PlayerMove()
     {
+        if (energy_Current <= 0 || this.GetComponent<Player_BackPack>().GetInCompositeMode()) return;
+
         float dx = Input.GetAxis("Horizontal");
         float dy = Input.GetAxis("Vertical");
         Vector3 vector = new Vector3(dx, dy);
@@ -78,6 +81,35 @@ public class Player : MoveObject
         Move(vector);
     }
 
+    // 控制人物移动(移动端)
+    public void PlayerMove(Vector3 dir)
+    {
+        if (energy_Current <= 0 || this.GetComponent<Player_BackPack>().GetInCompositeMode()) return;
+
+        //float dx = Input.GetAxis("Horizontal");
+        //float dy = Input.GetAxis("Vertical");
+
+        Vector3 vector = dir;
+
+        // 检测是否移动 (玩家体力消耗)
+        if (vector != Vector3.zero)
+        {
+            // 检测奔跑速度
+            if (GetSpeed() == DEFAULT_SPEED)
+                energy_Current -= energyConsumption_Walk * Time.deltaTime;
+            else
+                energy_Current -= energyConsumption_Rush * Time.deltaTime;
+        }
+        else
+        {
+            energy_Current -= energyConsumption_Idle * Time.deltaTime;
+        }
+        energy_Current = Mathf.Clamp(energy_Current, 0, DEFAULT_MAXENERGY);
+        energy_Slider.value = energy_Current;
+
+        Move(vector);
+    }
+
     // 控制人物冲刺
     private void PlayerRush()
     {
@@ -91,10 +123,23 @@ public class Player : MoveObject
         }
     }
 
+    // 控制人物冲刺(移动端)
+    public void PlayerRush(bool inRushed)
+    {
+        if (inRushed)
+        {
+            setSpeed(RUSH_SPEED);
+        }
+        else
+        {
+            setSpeed(DEFAULT_SPEED);
+        }
+    }
+
     // 控制玩家互动
     private void PlayerInteract() {
         // 如果玩家正在使用物品，屏蔽地图交互
-        if (GetComponent<Player_BackPack>().inSelected || GetComponent<Player_BackPack>().inMultipleSelected)
+        if (GetComponent<Player_BackPack>().inSelected)
         {
             return;
         }
@@ -127,8 +172,50 @@ public class Player : MoveObject
         }
     }
 
+    // 控制玩家互动(移动端)
+    public void PlayerInteract(int _index)
+    {
+        if (inMoved) return;
+
+        // 如果玩家正在使用物品，屏蔽地图交互
+        if (GetComponent<Player_BackPack>().inSelected)
+        {
+            return;
+        }
+
+        if (true)
+        {
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
+            if (colliders.Length > 0)
+            {
+                Collider2D item = null;
+                float dis = 0x9f9f9f9f;
+
+                for (int i = 0; i < colliders.Length; i++)
+                {
+                    if (!colliders[i].tag.Contains("Item"))
+                        continue;
+                    else
+                    {
+                        if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
+                        {
+                            dis = Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position);
+                            item = colliders[i];
+                        }
+                    }
+                }
+
+                if (item == null) { return; }
+                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+            }
+        }
+    }
+
     // 增加体力
     public void AddEnergy(float _value) {
         energy_Current += _value;
     }
+
+    public void SetInMoved(bool _moved) { inMoved = _moved; }
+    public bool GetInMoved() { return inMoved; }
 }

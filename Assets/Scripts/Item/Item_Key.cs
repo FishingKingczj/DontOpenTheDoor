@@ -102,6 +102,10 @@ public class Item_Key : Item
                     progressRing.fillAmount = (usageTime - timer_UsageTime) / usageTime;
                     return;
                 }
+                else
+                {
+                    Use_Reset();
+                }
             }
         }
     }
