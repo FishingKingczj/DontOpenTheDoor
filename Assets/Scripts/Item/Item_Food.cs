@@ -7,7 +7,7 @@ public class Item_Food : Item
 {
     private const float DEFAULT_ENERGYRESTORE = 10.0f;
 
-    void Start()
+    void Awake()
     {
         id = 0;
         name = "Food";

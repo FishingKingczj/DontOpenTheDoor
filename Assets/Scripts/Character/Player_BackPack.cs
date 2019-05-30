@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class Player_BackPack : MonoBehaviour
 {
@@ -16,25 +17,35 @@ public class Player_BackPack : MonoBehaviour
     public string[] item_Name;
     public string[] item_Description;
 
+    public int numberOfItem;
+
     [Header("Operation Vairable")]
     public bool inSelected = false;
-    public int selectedIndex = -1;
+
+    public List<int> selectIndex;
 
     public bool inUsed = false;
 
+    public bool inOperated = false;
+    public float operateDelayTime = 0.5f;
+
+    public Vector2 interact_Pivot;
+    public float interact_Radius;
+
     [Header("Composite Vairable")]
     public string[] compositeTable;
-    public bool inMultipleSelected = false;
-    public List<int> multipleSelectIndex;
+    public bool inCompositeMode = false;
 
-    public const float MULTIPLESELECTUSAGETIME = 1.0f;
-    public float timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
-
-    public const float COMPOSEITEMUSAGETIME = 2.0f;
+    public const float COMPOSEITEMUSAGETIME = 1.0f;
     public float timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
+
+    public Image progressRing;
 
     void Start()
     {
+        //获取互动按钮轴心和半径
+        interact_Pivot = GameObject.Find("Button_Interact").GetComponent<Transform>().position;
+        interact_Radius = GameObject.Find("Button_Interact").GetComponent<RectTransform>().sizeDelta.x * GameObject.Find("Button_Interact").GetComponent<RectTransform>().localScale.x;
 
         backpack = new GameObject[maxStorageAmount];
         text_StorageAmount = new Text[maxStorageAmount];
@@ -43,6 +54,8 @@ public class Player_BackPack : MonoBehaviour
         item_Id = new int[maxStorageAmount];
         item_Name = new string[maxStorageAmount];
         item_Description = new string[maxStorageAmount];
+
+        numberOfItem = 0;
 
         for (int i = 1; i <= maxStorageAmount; i++) {
             string n = "Box_" + i.ToString();
@@ -53,26 +66,24 @@ public class Player_BackPack : MonoBehaviour
         foreach (GameObject t in backpack) {
             text_StorageAmount[j++] = t.GetComponentInChildren<Text>();
         }
+
+        progressRing = GameObject.Find("ProgressRing").GetComponent<Image>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        if (!inUsed)
-        {
-            SelectItem();
-            if(!inMultipleSelected)
-            DiscardItem();
-        }
-        UseItem();
-        ComposeItem();
+        //SelectItem();//移动端注释 电脑端保留
+        //DiscardItem();//移动端注释 电脑端保留
+        UseItem(1); // 移动端(带任意整形参数) 电脑端(无参)
+        ComposeItem(1);// 移动端(带任意整形参数) 电脑端(无参)
     }
 
     private void OnGUI()
     {
         // 测试用 显示选择的物品信息
-        if (inSelected)
+        if (inSelected && selectIndex.Count == 1)
         {
-            GUI.TextField(new Rect(Screen.width / 2.0f - (Screen.height / 1.5f / 2.0f), Screen.height / 9.5f, Screen.height / 1.5f, Screen.height / 8), item_Name[selectedIndex] + '\n' + item_Description[selectedIndex]);
+            GUI.TextField(new Rect(Screen.width / 2.0f - (Screen.height / 1.5f / 2.0f), Screen.height / 9.5f, Screen.height / 1.5f, Screen.height / 8), item_Name[selectIndex[0]] + '\n' + item_Description[selectIndex[0]]);
         }
     }
 
@@ -91,7 +102,7 @@ public class Player_BackPack : MonoBehaviour
         for (int j = 0; j < maxStorageAmount; j++) {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItemToBackpack(_name);
+                GameObject item = LoadItemToBackpack(_id);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -108,6 +119,8 @@ public class Player_BackPack : MonoBehaviour
                 item_Id[j] = _id;
                 item_Name[j] = _name;
                 item_Description[j] = _description;
+
+                numberOfItem++;
                 return true;
             }
         }
@@ -122,7 +135,7 @@ public class Player_BackPack : MonoBehaviour
         {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItemToBackpack(_name);
+                GameObject item = LoadItemToBackpack(_id);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -144,6 +157,8 @@ public class Player_BackPack : MonoBehaviour
                 item_Id[j] = _id;
                 item_Name[j] = _name;
                 item_Description[j] = _description;
+
+                numberOfItem++;
                 return true;
             }
         }
@@ -153,8 +168,8 @@ public class Player_BackPack : MonoBehaviour
 
     // 删除物品
     public void RemoveItem(int _index) {
+        selectIndex.Remove(_index);
         inSelected = false;
-        selectedIndex = -1;
 
         Destroy(item_Group[_index]);
 
@@ -162,39 +177,67 @@ public class Player_BackPack : MonoBehaviour
         item_StorageAmount[_index] = 0;
         item_Name[_index] = null;
         item_Description[_index] = null;
+
+        numberOfItem--;
+        ResetSelectedPrompt();
     }
 
     // 丢弃物品(包含特殊处理)
     public void DiscardItem() {
+        if (inUsed || selectIndex.Count != 1) return;
+
         if (inSelected) {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                GameObject item = LoadItemToScene(item_Name[selectedIndex]);
+                GameObject item = LoadItemToScene(item_Id[selectIndex[0]]);
                 // 需要把物体的加到Room里
                 Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
                 item.transform.parent = room.transform;
                 item.transform.position = this.gameObject.transform.position;
 
                 // 特殊处理
-                if (item_Name[selectedIndex].Contains("Key"))
+                if (item_Name[selectIndex[0]].Contains("Key"))
                 {
-                    item.GetComponent<Item_Key>().SetPairingValue(item_Group[selectedIndex].GetComponent<Item_Key>().GetPairingValue());
+                    item.GetComponent<Item_Key>().SetPairingValue(item_Group[selectIndex[0]].GetComponent<Item_Key>().GetPairingValue());
                 }
 
-                ReflashItemAmount(selectedIndex, 0);
+                ReflashItemAmount(selectIndex[0], 0);
             }
         }
     }
 
-    // 加载物品(生成到道具栏)
-    public GameObject LoadItemToBackpack(string _name) {
-        switch (_name)
+    // 丢弃物品(包含特殊处理) (移动端)
+    public void DiscardItem(int _index)
+    {
+        if (inUsed || selectIndex.Count != 1) return;
+
+        if (inSelected && selectIndex.Count == 1)
         {
-            case "Food":
+            GameObject item = LoadItemToScene(item_Id[selectIndex[0]]);
+            // 需要把物体的加到Room里
+            Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
+            item.transform.parent = room.transform;
+            item.transform.position = this.gameObject.transform.position;
+
+            // 特殊处理
+            if (item_Name[selectIndex[0]].Contains("Key"))
+            {
+                item.GetComponent<Item_Key>().SetPairingValue(item_Group[selectIndex[0]].GetComponent<Item_Key>().GetPairingValue());
+            }
+
+            ReflashItemAmount(selectIndex[0], 0);
+        }
+    }
+
+    // 加载物品(生成到道具栏)
+    public GameObject LoadItemToBackpack(int _id) {
+        switch (_id)
+        {
+            case 0:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Food"));
                 }
-            case "Key":
+            case 1:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Key"));
                 }
@@ -206,14 +249,14 @@ public class Player_BackPack : MonoBehaviour
     }
 
     // 加载物品(生成到场景)
-    public GameObject LoadItemToScene(string _name) {
-        switch (_name)
+    public GameObject LoadItemToScene(int _id) {
+        switch (_id)
         {
-            case "Food":
+            case 0:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Food"));
                 }
-            case "Key":
+            case 1:
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Key"));
                 }
@@ -226,42 +269,71 @@ public class Player_BackPack : MonoBehaviour
 
     // 使用物品
     public void UseItem() {
-        if (inSelected)
+        if (inSelected && selectIndex.Count == 1)
         {
-            if (Input.GetKey(KeyCode.E)) {
+            if (Input.GetKey(KeyCode.E) && !inOperated) {
                 inUsed = true;
-                item_Group[selectedIndex].SendMessage("Use", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                item_Group[selectIndex[0]].SendMessage("Use", this.gameObject, SendMessageOptions.DontRequireReceiver);
             } else if (Input.GetKeyUp(KeyCode.E)) {
+                inOperated = false;
                 inUsed = false;
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                item_Group[selectIndex[0]].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
             }
         }
     }
 
-    // 物品使用成功
-    public void UseSucceed()
+    // 使用物品(移动端)
+    public void UseItem(int _index)
     {
-        inUsed = false;
-        ReflashItemAmount(selectedIndex, 0);
+        if (inSelected && selectIndex.Count == 1)
+        {
+            if (Input.touchCount > 0)
+            {
+                for (int i = 0; i < Input.touchCount; i++)
+                {
+                    float x = Input.GetTouch(i).position.x;
+                    float y = Input.GetTouch(i).position.y;
+
+                    if ((x > interact_Pivot.x - interact_Radius) && (x < interact_Pivot.x + interact_Radius) && (y > interact_Pivot.y - interact_Radius) && (y < interact_Pivot.y + interact_Radius))
+                    {
+                        if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(i).fingerId) && !inOperated)
+                        {
+                            inUsed = true;
+                            item_Group[selectIndex[0]].SendMessage("Use", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    // 刷新物品数量 1->增加 0->减少
-    public void ReflashItemAmount(int _index,int _opr) {
+    // 物品使用成功 (是否消耗当前物品)
+    public void UseSucceed(bool _delete = true)
+    {
+        inOperated = true;
+        inUsed = false;
+
+        if(_delete)
+        ReflashItemAmount(selectIndex[0], 0);
+    }
+
+    // 刷新物品数量 _opr:1->增加 0->减少 数量默认减少1
+    public void ReflashItemAmount(int _index,int _opr ,int _amount = 1) {
         if (_opr == 1)
         {
-            item_StorageAmount[_index]++;
+            item_StorageAmount[_index] += _amount;
             if(item_StorageAmount[_index] >= 2)
                 text_StorageAmount[_index].text = item_StorageAmount[_index].ToString();
         }
         else {
-            item_StorageAmount[_index]--;
+            item_StorageAmount[_index] -= _amount;
             if (item_StorageAmount[_index] < 2)
                 text_StorageAmount[_index].text = null;
             else {
                 text_StorageAmount[_index].text = item_StorageAmount[_index].ToString();
             }
 
-            if (item_StorageAmount[_index] == 0) {
+            if (item_StorageAmount[_index] <= 0) {
                 RemoveItem(_index);
             }
         }
@@ -270,164 +342,74 @@ public class Player_BackPack : MonoBehaviour
 
     // 选择物品
     public void SelectItem() {
-        // 长按 进入/退出 选择模式
-        if (Input.GetKey(KeyCode.Alpha1) || Input.GetKey(KeyCode.Alpha2) || Input.GetKey(KeyCode.Alpha3) || Input.GetKey(KeyCode.Alpha4))
-        {
-            if (timer_MultipleSelectUsageTime <= 0)
-            {
-                if (!inMultipleSelected)
-                {
-                    EnterMultipleSelectMode();
-                }
-                else {
-                    ExitMultipleSelectMode();
-                }
-            }
-            else
-            {
-                timer_MultipleSelectUsageTime -= Time.deltaTime;
-            }
-        }
-        else {
-            timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
-        }
+        if (inUsed) return;
 
+        // 选择单个物品
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (inMultipleSelected) {
-                if (multipleSelectIndex.Contains(0))
-                {
-                    multipleSelectIndex.Remove(0);
-                }
-                else {
-                    multipleSelectIndex.Add(0);
-                }
-                return;
-            }
-
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-                
-                if (item_Group[0] != null && selectedIndex != 0) {
-                    selectedIndex = 0;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[0] == null) return;
-
-                inSelected = !inSelected;selectedIndex = 0;
-            }
+            Selected(1);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            if (inMultipleSelected)
-            {
-                if (multipleSelectIndex.Contains(1))
-                {
-                    multipleSelectIndex.Remove(1);
-                }
-                else
-                {
-                    multipleSelectIndex.Add(1);
-                }
-                return;
-            }
-
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-
-                if (item_Group[1] != null && selectedIndex != 1) {
-                    selectedIndex = 1;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[1] == null) return;
-
-                inSelected = !inSelected; selectedIndex = 1;
-            }
+            Selected(2);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            if (inMultipleSelected)
-            {
-                if (multipleSelectIndex.Contains(2))
-                {
-                    multipleSelectIndex.Remove(2);
-                }
-                else
-                {
-                    multipleSelectIndex.Add(2);
-                }
-                return;
-            }
-
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-
-                if (item_Group[2] != null && selectedIndex != 2) {
-                    selectedIndex = 2;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
-            }
-            else {
-                if (item_Group[2] == null) return;
-
-                inSelected = !inSelected; selectedIndex = 2;
-            }
+            Selected(3);
         }
         else if (Input.GetKeyDown(KeyCode.Alpha4))
         {
-            if (inMultipleSelected)
+            Selected(4);
+        }
+    }
+
+    // 选中物品
+    public void Selected(int _index) 
+    {
+        if (inUsed) return;
+
+        if (item_Group[_index - 1] != null) {
+            // 选择
+            if (!selectIndex.Contains(_index - 1))
             {
-                if (multipleSelectIndex.Contains(3))
-                {
-                    multipleSelectIndex.Remove(3);
-                }
-                else
-                {
-                    multipleSelectIndex.Add(3);
-                }
-                return;
-            }
+                backpack[_index - 1].GetComponent<Image>().color = Color.red;
 
-            if (inSelected) {
-                item_Group[selectedIndex].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
-
-                if (item_Group[3] != null && selectedIndex != 3)
-                {
-                    selectedIndex = 3;
-                    return;
-                }
-                inSelected = !inSelected; selectedIndex = -1;
+                selectIndex.Add(_index - 1);
             }
-            else {
-                if (item_Group[3] == null) return;
+            // 取消选择
+            else { 
+                backpack[_index - 1].GetComponent<Image>().color = Color.white;
 
-                inSelected = !inSelected; selectedIndex = 3;
+                selectIndex.Remove(_index - 1);
             }
+        }
+
+        if (selectIndex.Count != 0) inSelected = true;
+        else inSelected = false;
+    }
+
+    // 重设所有选中提示
+    public void ResetSelectedPrompt() {
+        for (int i = 0; i < maxStorageAmount; i++) {
+            backpack[i].GetComponent<Image>().color = Color.white;
         }
     }
 
     // 合成物品
     public void ComposeItem() {
-        if (!inMultipleSelected) {
-            return;
-        }
+        if (selectIndex.Count < 2) return;
 
         if (Input.GetKey(KeyCode.E))
         {
             if (timer_ComposeItemUsageTime <= 0)
             {
+                CancelOperation();
+
                 // 检索合成表
                 string compositeInfo = null;
 
                 // 未选择大于 1 个的对象
-                if (multipleSelectIndex.Count <= 1) {
+                if (selectIndex.Count <= 1) {
                     Debug.Log("必须选择大于 1 个的对象");
                     ExitMultipleSelectMode();
                     return;
@@ -435,8 +417,8 @@ public class Player_BackPack : MonoBehaviour
 
                 // 选择了包含重复 id 物品
                 List<int> checkGroup = new List<int>();
-                for (int k = 0; k < multipleSelectIndex.Count; k++) {
-                    if (checkGroup.Contains(item_Id[multipleSelectIndex[k]]))
+                for (int k = 0; k < selectIndex.Count; k++) {
+                    if (checkGroup.Contains(item_Id[selectIndex[k]]))
                     {
                         //TODO Reduce RestorageAmount
                         Debug.Log("无对应合成信息");
@@ -444,21 +426,21 @@ public class Player_BackPack : MonoBehaviour
                         return;
                     }
                     else {
-                        checkGroup.Add(item_Id[multipleSelectIndex[k]]);
+                        checkGroup.Add(item_Id[selectIndex[k]]);
                     }
                 }
 
                 // 检索合成信息
-                switch (multipleSelectIndex.Count)
+                switch (selectIndex.Count)
                 {
                     case 2:
                         {
                             for (int i = 0; i < compositeTable.Length; i++)
                             {
-                                if (compositeTable[i].Split(' ').Length - 1 != multipleSelectIndex.Count)
+                                if (compositeTable[i].Split(' ').Length - 1 != selectIndex.Count)
                                     continue;
 
-                                if (compositeTable[i].Contains(item_Id[multipleSelectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[multipleSelectIndex[1]] + "-"))
+                                if (compositeTable[i].Contains(item_Id[selectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[1]] + "-"))
                                 {
                                     Debug.Log("Find : " + compositeTable[i]);
                                     compositeInfo = compositeTable[i];
@@ -471,10 +453,10 @@ public class Player_BackPack : MonoBehaviour
                         {
                             for (int i = 0; i < compositeTable.Length; i++)
                             {
-                                if (compositeTable[i].Split(' ').Length - 1 != multipleSelectIndex.Count)
+                                if (compositeTable[i].Split(' ').Length - 1 != selectIndex.Count)
                                     continue;
 
-                                if (compositeTable[i].Contains(item_Id[multipleSelectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[multipleSelectIndex[1]] + "-") && compositeTable[i].Contains(item_Id[multipleSelectIndex[2]] + "-"))
+                                if (compositeTable[i].Contains(item_Id[selectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[1]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[2]] + "-"))
                                 {
                                     Debug.Log("Find : " + compositeTable[i]);
                                     compositeInfo = compositeTable[i];
@@ -487,10 +469,10 @@ public class Player_BackPack : MonoBehaviour
                         {
                             for (int i = 0; i < compositeTable.Length; i++)
                             {
-                                if (compositeTable[i].Split(' ').Length - 1 != multipleSelectIndex.Count)
+                                if (compositeTable[i].Split(' ').Length - 1 != selectIndex.Count)
                                     continue;
 
-                                if (compositeTable[i].Contains(item_Id[multipleSelectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[multipleSelectIndex[1]] + "-") && compositeTable[i].Contains(item_Id[multipleSelectIndex[3]] + "-") && compositeTable[i].Contains(item_Id[multipleSelectIndex[4]] + "-"))
+                                if (compositeTable[i].Contains(item_Id[selectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[1]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[3]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[4]] + "-"))
                                 {
                                     Debug.Log("Find : " + compositeTable[i]);
                                     compositeInfo = compositeTable[i];
@@ -510,19 +492,19 @@ public class Player_BackPack : MonoBehaviour
                     return;
                 }
 
-                // 开始检测量检测
+                // 开始数量检测
                 string[] amount = compositeInfo.Split(' ');
                 for (int i = 0; i < amount.Length - 1; i++)
                 {
                     int itemId = int.Parse(amount[i].Split('-')[0]);
                     int itemAmount = int.Parse(amount[i].Split('-')[1]);
 
-                    for (int j = 0; j < multipleSelectIndex.Count; j++)
+                    for (int j = 0; j < selectIndex.Count; j++)
                     {
-                        if (item_Id[multipleSelectIndex[j]] != itemId) continue;
+                        if (item_Id[selectIndex[j]] != itemId) continue;
 
                         // 需求量不足
-                        if (item_StorageAmount[multipleSelectIndex[j]] < itemAmount)
+                        if (item_StorageAmount[selectIndex[j]] < itemAmount)
                         {
                             //TODO Reduce RestorageAmount
                             Debug.Log("材料不足");
@@ -532,33 +514,242 @@ public class Player_BackPack : MonoBehaviour
                     }
                 }
 
-                //TODO Create new item and delete stuff
-                Debug.Log("合成成功 结果:" + amount[2].Split('=')[0] + " 数量: " + amount[2].Split('=')[1]);
-                ExitMultipleSelectMode();
+                // 消耗材料合成
+                for (int i = 0; i < amount.Length - 1; i++)
+                {
+                    int itemId = int.Parse(amount[i].Split('-')[0]);
+                    int itemAmount = int.Parse(amount[i].Split('-')[1]);
 
+                    for (int j = 0; j < selectIndex.Count; j++)
+                    {
+                        if (item_Id[selectIndex[j]] != itemId) continue;
+                        ReflashItemAmount(selectIndex[j], 0, itemAmount);
+                        break;
+                    }
+                }
+
+                // 生成合成物品(临时使用Key代替)
+                Debug.Log("合成成功 结果:" + amount[2].Split('=')[0] + " 数量: " + amount[2].Split('=')[1]);
+
+                for (int i = 0; i < int.Parse(amount[2].Split('=')[1]); i++)
+                {
+                    GameObject item = LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
+                    Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
+                    item.transform.parent = room.transform;
+                    item.transform.position = this.gameObject.transform.position;
+
+                    item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                }
+
+                ExitMultipleSelectMode();
             }
             else {
+                // 延迟进度环
+                if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME - operateDelayTime))
+                {
+                    progressRing.fillAmount = ((COMPOSEITEMUSAGETIME - operateDelayTime) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME - operateDelayTime);
+                }
                 timer_ComposeItemUsageTime -= Time.deltaTime;
+                inCompositeMode = true;
             }
         }
 
-        if (Input.GetKeyUp(KeyCode.E)) { timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME; }
+        if (Input.GetKeyUp(KeyCode.E)) { CancelOperation(); }
     }
 
-    // 进入\退出 多选择模式
-    public void EnterMultipleSelectMode() {
-        inMultipleSelected = true;
-        inSelected = false;
-        selectedIndex = -1;
+    // 合成物品(移动端)
+    public void ComposeItem(int _index)
+    {
+        if (selectIndex.Count < 2) return;
 
-        timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
-        timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
+        if (Input.touchCount > 0)
+        {
+            for (int q = 0; q < Input.touchCount; q++)
+            {
+                float x = Input.GetTouch(q).position.x;
+                float y = Input.GetTouch(q).position.y;
+
+                if ((x > interact_Pivot.x - interact_Radius) && (x < interact_Pivot.x + interact_Radius) && (y > interact_Pivot.y - interact_Radius) && (y < interact_Pivot.y + interact_Radius))
+                {
+                    if (Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(q).fingerId))
+                    {
+                        if (timer_ComposeItemUsageTime <= 0)
+                        {
+                            // 检索合成表
+                            string compositeInfo = null;
+
+                            // 选择了包含重复 id 物品
+                            List<int> checkGroup = new List<int>();
+                            for (int k = 0; k < selectIndex.Count; k++)
+                            {
+                                if (checkGroup.Contains(item_Id[selectIndex[k]]))
+                                {
+                                    //TODO Reduce RestorageAmount
+                                    Debug.Log("无对应合成信息");
+                                    ExitMultipleSelectMode();
+                                    return;
+                                }
+                                else
+                                {
+                                    checkGroup.Add(item_Id[selectIndex[k]]);
+                                }
+                            }
+
+                            // 检索合成信息
+                            switch (selectIndex.Count)
+                            {
+                                case 2:
+                                    {
+                                        for (int i = 0; i < compositeTable.Length; i++)
+                                        {
+                                            if (compositeTable[i].Split(' ').Length - 1 != selectIndex.Count)
+                                                continue;
+
+                                            if (compositeTable[i].Contains(item_Id[selectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[1]] + "-"))
+                                            {
+                                                Debug.Log("Find : " + compositeTable[i]);
+                                                compositeInfo = compositeTable[i];
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case 3:
+                                    {
+                                        for (int i = 0; i < compositeTable.Length; i++)
+                                        {
+                                            if (compositeTable[i].Split(' ').Length - 1 != selectIndex.Count)
+                                                continue;
+
+                                            if (compositeTable[i].Contains(item_Id[selectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[1]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[2]] + "-"))
+                                            {
+                                                Debug.Log("Find : " + compositeTable[i]);
+                                                compositeInfo = compositeTable[i];
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                                case 4:
+                                    {
+                                        for (int i = 0; i < compositeTable.Length; i++)
+                                        {
+                                            if (compositeTable[i].Split(' ').Length - 1 != selectIndex.Count)
+                                                continue;
+
+                                            if (compositeTable[i].Contains(item_Id[selectIndex[0]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[1]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[3]] + "-") && compositeTable[i].Contains(item_Id[selectIndex[4]] + "-"))
+                                            {
+                                                Debug.Log("Find : " + compositeTable[i]);
+                                                compositeInfo = compositeTable[i];
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    }
+                            }
+
+                            // 未找到合成信息
+                            if (compositeInfo == null)
+                            {
+                                //TODO Reduce RestorageAmount
+                                Debug.Log("无对应合成信息");
+                                ExitMultipleSelectMode();
+                                return;
+                            }
+
+                            // 开始数量检测
+                            string[] amount = compositeInfo.Split(' ');
+                            for (int i = 0; i < amount.Length - 1; i++)
+                            {
+                                int itemId = int.Parse(amount[i].Split('-')[0]);
+                                int itemAmount = int.Parse(amount[i].Split('-')[1]);
+
+                                for (int j = 0; j < selectIndex.Count; j++)
+                                {
+                                    if (item_Id[selectIndex[j]] != itemId) continue;
+
+                                    // 需求量不足
+                                    if (item_StorageAmount[selectIndex[j]] < itemAmount)
+                                    {
+                                        //TODO Reduce RestorageAmount
+                                        Debug.Log("材料不足");
+                                        ExitMultipleSelectMode();
+                                        return;
+                                    }
+                                }
+                            }
+
+                            // 消耗材料合成
+                            for (int i = 0; i < amount.Length - 1; i++)
+                            {
+                                int itemId = int.Parse(amount[i].Split('-')[0]);
+                                int itemAmount = int.Parse(amount[i].Split('-')[1]);
+
+                                for (int j = 0; j < selectIndex.Count; j++)
+                                {
+                                    if (item_Id[selectIndex[j]] != itemId) continue;
+                                    ReflashItemAmount(selectIndex[j], 0, itemAmount);
+                                    break;
+                                }
+                            }
+
+                            // 生成合成物品(临时使用Key代替)
+                            Debug.Log("合成成功 结果:" + amount[2].Split('=')[0] + " 数量: " + amount[2].Split('=')[1]);
+
+                            for (int i = 0; i < int.Parse(amount[2].Split('=')[1]); i++)
+                            {
+                                GameObject item = LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
+                                Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
+                                item.transform.parent = room.transform;
+                                item.transform.position = this.gameObject.transform.position;
+
+                                item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
+                            }
+
+                            ExitMultipleSelectMode();
+                        }
+                        else
+                        {
+                            // 延迟进度环
+                            if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME - operateDelayTime))
+                            {
+                                progressRing.fillAmount = ((COMPOSEITEMUSAGETIME - operateDelayTime) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME - operateDelayTime);
+                            }
+                            inCompositeMode = true;
+                            timer_ComposeItemUsageTime -= Time.deltaTime;
+                        }
+                    }
+                }
+            }
+        }
+       
     }
+
+    //退出多选模式
     public void ExitMultipleSelectMode() {
-        multipleSelectIndex.Clear();
-        inMultipleSelected = false;
+        selectIndex.Clear();
+        inSelected = false;
 
-        timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
-        timer_MultipleSelectUsageTime = MULTIPLESELECTUSAGETIME;
+        ResetSelectedPrompt();
+        CancelOperation();
+
+        inCompositeMode = false;
     }
+
+    // 重设定时器(取消操作)
+    public void CancelOperation() {
+        progressRing.fillAmount = 0;
+        timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
+
+        inOperated = false;
+
+        if (inUsed) {
+            inUsed = false;
+            item_Group[selectIndex[0]].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
+        }
+
+        inCompositeMode = false;
+    }
+
+    public bool GetInCompositeMode() { return inCompositeMode; }
 }

@@ -17,7 +17,7 @@ public class Item_Door : Item
     public Item_Door lastDoor;
     private const float MIN_DISTANCE = 1f;
 
-    void Start()
+    void Awake()
     {
         // TODO animate
         SpriteRenderer sr = gameObject.transform.GetComponent<SpriteRenderer>();

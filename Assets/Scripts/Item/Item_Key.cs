@@ -10,7 +10,7 @@ public class Item_Key : Item
     [Header("Additional Varible")]
     public int pairingValue;
 
-    void Start()
+    void Awake()
     {
         id = 1;
         name = "Key";
@@ -53,12 +53,14 @@ public class Item_Key : Item
                     {
                         Debug.Log("开锁成功");
 
+                        _user.GetComponent<Player_BackPack>().UseSucceed(false);
                         t.GetComponent<Item_Door>().Unlock();
                     }
                     else
                     {
                         Debug.Log("上锁成功");
 
+                        _user.GetComponent<Player_BackPack>().UseSucceed(false);
                         t.GetComponent<Item_Door>().Lock();
                     }
                     return;
@@ -99,6 +101,10 @@ public class Item_Key : Item
 
                     progressRing.fillAmount = (usageTime - timer_UsageTime) / usageTime;
                     return;
+                }
+                else
+                {
+                    Use_Reset();
                 }
             }
         }
