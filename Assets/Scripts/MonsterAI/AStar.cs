@@ -5,6 +5,8 @@ using System.Collections.Generic;
 //A*寻路
 public class AStar : MonoBehaviour
 {
+    public float monsterSize = 0.5f;
+
 
     private Map map = new Map();//格子地图
 
@@ -93,7 +95,9 @@ public class AStar : MonoBehaviour
 
         //将起点格子添加到开启列表中
         open_List.Add(starMapPoint);
-
+        int count = 625;
+        MapPoint closePoint = starMapPoint;
+        float closeDistance = 25;
         //寻找最佳路径
         //当目标点不在打开路径中时或者打开列表为空时循环执行
         while (!IsInOpenList(targetMapPoint.x, targetMapPoint.y) || open_List.Count == 0)
@@ -110,10 +114,18 @@ public class AStar : MonoBehaviour
 
             //检查改点周边的格子
             CheckPerPointWithMap(minPoint, targetMapPoint);
+
+            if (closeDistance > Vector2.Distance(new Vector2(targetMapPoint.x, targetMapPoint.y), new Vector2(minPoint.x, minPoint.y))) {
+                closeDistance = Vector2.Distance(new Vector2(targetMapPoint.x, targetMapPoint.y), new Vector2(minPoint.x, minPoint.y));
+                closePoint = minPoint;
+            }
+            count--;
+            if (count < 0) break;
         }
 
         //在开启列表中找到终点
         MapPoint endPoint = FindInOpenList(targetMapPoint.x, targetMapPoint.y);
+        if (count < 0) endPoint = closePoint;
 
         Vector2 everyWay = new Vector2(endPoint.x,endPoint.y);//保存单个路径点
 
@@ -154,7 +166,7 @@ public class AStar : MonoBehaviour
         Vector2 p = new Vector2(x, y);
 
         //检测该点周边是否有障碍物
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(p, 0.5f);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(p, monsterSize);
         var f = false;
         foreach (Collider2D collider in colliders)
         {
