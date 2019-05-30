@@ -4,9 +4,23 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
+    //monster parameter
+    public float monster_attackTime = 1.0f;
+    public float monster_attackScale = 1.0f;
+    public float monster_rushTime = 1.0f;
+    public float monster_rushSpeed = 2.0f;
+    public float monster_walkTime = 0.9f;
+    public float monster_walkSpeed = 1.0f;
+    public float monster_hangOutTime = 1.0f;
+    public float monster_hangOutSpeed = 1.0f;
+    private float monster_goBackTime = 1000000.0f;
+    public float monster_goBackSpeed = 1.0f;
+
+    /************************/
+
     private State state = new State();
     private MonsterAI monsterAI = new MonsterAI();
-    private MonsterParameter monsterParameter = new MonsterParameter();
+    //private MonsterParameter monsterParameter;
 
     private float timer = 0;
     private Vector2 brithposiotion = new Vector2();
@@ -22,6 +36,9 @@ public class Monster : MonoBehaviour
     protected void DecisionLayer()
     {
         if (state.issueType.Equals(MonsterState.canAttack)) timer = -1.0f;
+        if (state.issueType.Equals(MonsterState.seePlayer) && (state.stateType.Equals(MonsterState.hangOut)|| state.stateType.Equals(MonsterState.goBack))) {
+            timer = -1.0f;
+        }
 
         if (timer < 0)
         {
@@ -31,13 +48,31 @@ public class Monster : MonoBehaviour
             if (state.intentionType.Equals(MonsterState.walk))
             {
                 aimObject = GameObject.Find("player");
+                timer = monster_walkTime;
             }
-            else if (state.intentionType.Equals(MonsterState.rush)) {
+            else if (state.intentionType.Equals(MonsterState.rush))
+            {
                 aimObject = GameObject.Find("player");
-                aimPoint = (Vector2) aimObject.transform.position;
+                aimPoint = (Vector2)aimObject.transform.position;
+                timer = monster_walkTime;
             }
-
-            timer = monsterParameter.getParameter(state.intentionType);
+            else if (state.intentionType.Equals(MonsterState.attack))
+            {
+                timer = monster_attackTime;
+            }
+            else if (state.intentionType.Equals(MonsterState.hangOut))
+            {
+                timer = monster_hangOutTime;
+                aimPoint = new Vector2(transform.position.x + Random.value * 3, transform.position.y + Random.value * 3);
+            }
+            else if (state.intentionType.Equals(MonsterState.goBack))
+            {
+                timer = monster_goBackTime;
+                aimPoint = brithposiotion;
+            }
+            else
+                timer = -1.0f;
+            
         }
 
         timer = timer - Time.deltaTime;
@@ -47,14 +82,11 @@ public class Monster : MonoBehaviour
     {
         if (state.intentionType.Equals(MonsterState.walk))
         {
-            autoMove((Vector2)aimObject.transform.position);
+            autoMove((Vector2)aimObject.transform.position, monster_walkSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.rush))
         {
-            simpleMove(aimPoint);
-            if (Vector2.Distance((Vector2) transform.position, aimPoint)<0.1f) {
-                timer = -1.0f;
-            }
+            straightMove(aimPoint, monster_rushSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.attack))
         {
@@ -62,39 +94,48 @@ public class Monster : MonoBehaviour
         }
         else if (state.intentionType.Equals(MonsterState.goBack))
         {
+            if (Vector2.Distance(aimPoint, (Vector2)transform.position) < 0.5f) timer = -1.0f;
+            straightMove(aimPoint, monster_goBackSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.hangOut))
         {
-
+            straightMove(aimPoint, monster_hangOutSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.stay))
         {
 
         }
+        else {
+            Debug.Log("error action");
+        }
     }
 
-    private void simpleMove(Vector2 targetPoint) {
+    private void faceTo(Vector2 targetPoint) {
+        if (targetPoint.x < transform.position.x)
+        {
+            transform.localEulerAngles = new Vector3(0, 180, 0);
+        }
+        else {
+            transform.localEulerAngles = new Vector3(0, 0, 0);
+        }
+    }
+
+    private void straightMove(Vector2 targetPoint,float speed) {
+        faceTo(targetPoint);
         Vector2 direction = (targetPoint - (Vector2)transform.position).normalized;
-        float x = transform.position.x + direction.x * monsterParameter.getParameter("speed") * Time.deltaTime;
-        float y = transform.position.y + direction.y * monsterParameter.getParameter("speed") * Time.deltaTime;
+        float x = transform.position.x + direction.x * speed * Time.deltaTime;
+        float y = transform.position.y + direction.y * speed * Time.deltaTime;
         transform.position = new Vector3(x, y, transform.position.z);
         return;
     }
 
-    private void autoMove(Vector2 targetPoint) {
-        if (Vector2.Distance((Vector2)transform.position, targetPoint) < monsterParameter.getParameter("attackScale"))
+    private void autoMove(Vector2 targetPoint,float speed) {
+        faceTo(targetPoint);
+        if (Vector2.Distance((Vector2)transform.position, targetPoint) < monster_attackScale)
                 return;
         Vector2[] ways = GetComponent<AStar>().AStarFindWay((Vector2)transform.position, targetPoint);
-        Debug.Log(11111111111);
-        Debug.Log((Vector2)transform.position);
-        Debug.Log(targetPoint);
-        Debug.Log(ways[0]);
-       
-
         if (ways.Length < 2) return;
-        simpleMove(ways[1]);
-        Debug.Log(ways[1]);
-
+        straightMove(ways[1],speed);
         return;
     }
 
@@ -103,17 +144,13 @@ public class Monster : MonoBehaviour
     {
         brithposiotion = transform.position;
 
-        aimObject = GameObject.Find("player");
-        autoMove((Vector2)aimObject.transform.position);
-
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*DecisionLayer();
-        AciotnLayer();*/
-        autoMove((Vector2)aimObject.transform.position);
+        DecisionLayer();
+        AciotnLayer();
     }
 
     void OnTriggerEnter2D(Collider2D collider)
@@ -129,7 +166,7 @@ public class Monster : MonoBehaviour
                     state.issueType = MonsterState.seeCollision;
             }
             if (state.issueType == MonsterState.seePlayer) {
-                if (Vector2.Distance((Vector2) feeledObject.transform.position, (Vector2) transform.position)<monsterParameter.getParameter("attackScale"))
+                if (Vector2.Distance((Vector2) feeledObject.transform.position, (Vector2) transform.position)< monster_attackScale)
                     state.issueType = MonsterState.canAttack;
             }
         }
@@ -152,7 +189,7 @@ public class Monster : MonoBehaviour
             }
             if (state.issueType == MonsterState.seePlayer)
             {
-                if (Vector2.Distance((Vector2)feeledObject.transform.position, (Vector2)transform.position) < monsterParameter.getParameter("attackScale"))
+                if (Vector2.Distance((Vector2)feeledObject.transform.position, (Vector2)transform.position) < monster_attackScale)
                     state.issueType = MonsterState.canAttack;
             }
         }
@@ -196,17 +233,18 @@ public class State
     }
 }
 
-public class MonsterParameter
+/*public class MonsterParameter
 {
     private Dictionary<string, float> para = new Dictionary<string, float>();
-    public MonsterParameter()
+    public MonsterParameter(float _attackTime, float _attackScale,float _walkTime,float _walkSpeed,float _rushTime,float _rushSpeed)
     {
         //读入配置表
-        para.Add("speed", 10.0f);
-        para.Add("attackScale", 1.5f);
-        para.Add("attacking", 1.0f);
-        para.Add("walk", 0.9f);
-        para.Add("rush", 2.0f);
+        para.Add("attack", _attackTime);
+        para.Add("attackScale", _attackScale);
+        para.Add("walk", _walkTime);
+        para.Add("walkSpeed", _walkSpeed);
+        para.Add("rush", _rushTime);
+        para.Add("rushSpeed", _rushSpeed);
     }
     public float getParameter(string parameterName)
     {
@@ -216,7 +254,7 @@ public class MonsterParameter
         }
         return -1.0f;
     }
-}
+}*/
 
 public class MonsterAI
 {
@@ -224,22 +262,47 @@ public class MonsterAI
     public MonsterAI()
     {
         //读入配置表
-        ai.Add("stay_seeNothing", "stay");
-        ai.Add("stay_seeDoor", "stay");
-        ai.Add("stay_seeCollision", "stay");
+        ai.Add("stay_seeNothing", "hangOut");
+        ai.Add("stay_seeDoor", "hangOut");
+        ai.Add("stay_seeCollision", "hangOut");
         ai.Add("stay_seePlayer","walk");
+        ai.Add("stay_canAttack", "attack");
+
+        ai.Add("walk_seeNothing", "hangOut");
+        ai.Add("walk_seeDoor", "hangOut");
+        ai.Add("walk_seeCollision", "walk");
         ai.Add("walk_seePlayer", "rush");
+        ai.Add("walk_canAttack", "attack");
+
+        ai.Add("rush_seeNothing", "hangOut");
+        ai.Add("rush_seeDoor", "hangOut");
+        ai.Add("rush_seeCollision", "walk");
         ai.Add("rush_seePlayer", "walk");
-        ai.Add("rush_canAttack", "attacking");
-        ai.Add("walk_canAttack", "attacking");
-        ai.Add("attacking_seeNothing", "stay");
-        ai.Add("attacking_seeDoor", "walk");
-        ai.Add("attacking_seePlayer", "walk");
-        ai.Add("attacking_seeCollision", "walk");
-        ai.Add("attacking_canAttack", "attacking");
-        ai.Add("error_seeDoor", "stay");
-        ai.Add("error_seeCollision", "stay");
-        ai.Add("error_seePlayer", "stay");
+        ai.Add("rush_canAttack", "attack");
+
+        ai.Add("attack_seeNothing", "hangOut");
+        ai.Add("attack_seeDoor", "hangOut");
+        ai.Add("attack_seeCollision", "walk");
+        ai.Add("attack_seePlayer", "walk");
+        ai.Add("attack_canAttack", "attack");
+
+        ai.Add("hangOut_seeNothing", "goBack");
+        ai.Add("hangOut_seeDoor", "goBack");
+        ai.Add("hangOut_seeCollision", "walk");
+        ai.Add("hangOut_seePlayer", "rush");
+        ai.Add("hangOut_canAttack", "attack");
+
+        ai.Add("goBack_seeNothing", "hangOut");
+        ai.Add("goBack_seeDoor", "hangOut");
+        ai.Add("goBack_seeCollision", "walk");
+        ai.Add("goBack_seePlayer", "walk");
+        ai.Add("goBack_canAttack", "attack");
+
+        ai.Add("error_seeNothing", "error");
+        ai.Add("error_seeDoor", "error");
+        ai.Add("error_seeCollision", "error");
+        ai.Add("error_seePlayer", "error");
+        ai.Add("error_canAttack", "error");
     }
     public string getIntentionType(string state_issue)
     {
@@ -260,7 +323,7 @@ public static class MonsterState
     public static string walk = "walk";
     public static string rush = "rush";
     public static string goBack = "goBack";
-    public static string attack = "attacking";
+    public static string attack = "attack";
 
     public static string seeNothing = "seeNothing";
     public static string seePlayer = "seePlayer";
