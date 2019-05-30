@@ -44,8 +44,12 @@ public class Player_BackPack : MonoBehaviour
     void Start()
     {
         //获取互动按钮轴心和半径
-        interact_Pivot = GameObject.Find("Button_Interact").GetComponent<Transform>().position;
-        interact_Radius = GameObject.Find("Button_Interact").GetComponent<RectTransform>().sizeDelta.x * GameObject.Find("Button_Interact").GetComponent<RectTransform>().localScale.x;
+        var obj = GameObject.Find("Canvas_UI").transform.Find("Button_Interact").gameObject;
+        interact_Pivot = obj.GetComponent<Transform>().position;
+        interact_Radius = obj.GetComponent<RectTransform>().sizeDelta.x * obj.GetComponent<RectTransform>().localScale.x;
+
+        //interact_Pivot = GameObject.Find("Button_Interact").GetComponent<Transform>().position;
+        //interact_Radius = GameObject.Find("Button_Interact").GetComponent<RectTransform>().sizeDelta.x * GameObject.Find("Button_Interact").GetComponent<RectTransform>().localScale.x;
 
         backpack = new GameObject[maxStorageAmount];
         text_StorageAmount = new Text[maxStorageAmount];
@@ -67,15 +71,30 @@ public class Player_BackPack : MonoBehaviour
             text_StorageAmount[j++] = t.GetComponentInChildren<Text>();
         }
 
-        progressRing = GameObject.Find("ProgressRing").GetComponent<Image>();
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("Button_Interact").transform.Find("ProgressRing").gameObject.GetComponent<Image>();
     }
 
     void FixedUpdate()
     {
-        //SelectItem();//移动端注释 电脑端保留
-        //DiscardItem();//移动端注释 电脑端保留
-        UseItem(1); // 移动端(带任意整形参数) 电脑端(无参)
-        ComposeItem(1);// 移动端(带任意整形参数) 电脑端(无参)
+
+#if UNITY_ANDROID
+            UseItem(1); // 移动端(带任意整形参数) 电脑端(无参)
+            ComposeItem(1);// 移动端(带任意整形参数) 电脑端(无参)
+#endif
+
+#if UNITY_IPHONE
+#endif
+
+#if UNITY_STANDALONE_WIN
+            UseItem(1);
+            ComposeItem(1);
+            UseItem();
+            ComposeItem();
+            SelectItem();//移动端注释 电脑端保留
+            DiscardItem();//移动端注释 电脑端保留
+#endif
+
+
     }
 
     private void OnGUI()
@@ -269,6 +288,7 @@ public class Player_BackPack : MonoBehaviour
 
     // 使用物品
     public void UseItem() {
+        
         if (inSelected && selectIndex.Count == 1)
         {
             if (Input.GetKey(KeyCode.E) && !inOperated) {

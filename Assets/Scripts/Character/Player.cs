@@ -37,9 +37,20 @@ public class Player : MoveObject
 
     void FixedUpdate()
     {
-        //PlayerRush(); //移动端注释 电脑端保留
-        //PlayerMove(); //移动端注释 电脑端保留
         PlayerInteract();
+#if UNITY_ANDROID
+            //Debug.Log("这里是安卓设备^_^");
+#endif
+
+#if UNITY_IPHONE
+            //Debug.Log("这里是苹果设备>_<");
+#endif
+
+#if UNITY_STANDALONE_WIN
+            PlayerRush();
+            PlayerMove();
+            //Debug.Log("我是从Windows的电脑上运行的T_T");
+#endif
     }
 
     void OnTriggerEnter2D(Collider2D collider)

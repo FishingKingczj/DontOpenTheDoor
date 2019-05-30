@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class Monster : MonoBehaviour
 {
@@ -13,6 +15,7 @@ public class Monster : MonoBehaviour
     public float monster_walkSpeed = 1.0f;
     public float monster_hangOutTime = 1.0f;
     public float monster_hangOutSpeed = 1.0f;
+    public float monster_hangOutScale = 10.0f;
     private float monster_goBackTime = 1000000.0f;
     public float monster_goBackSpeed = 1.0f;
 
@@ -63,7 +66,7 @@ public class Monster : MonoBehaviour
             else if (state.intentionType.Equals(MonsterState.hangOut))
             {
                 timer = monster_hangOutTime;
-                aimPoint = new Vector2(transform.position.x + Random.value * 3, transform.position.y + Random.value * 3);
+                aimPoint = new Vector2(transform.position.x + 2*(Random.value-0.5f) * monster_hangOutScale, transform.position.y + 2 * (Random.value - 0.5f) * monster_hangOutScale);
             }
             else if (state.intentionType.Equals(MonsterState.goBack))
             {
@@ -91,6 +94,7 @@ public class Monster : MonoBehaviour
         else if (state.intentionType.Equals(MonsterState.attack))
         {
             Debug.Log("Monster is attacking!!!!");
+            SceneManager.LoadScene(0);
         }
         else if (state.intentionType.Equals(MonsterState.goBack))
         {
