@@ -37,20 +37,18 @@ public class Player : MoveObject
 
     void FixedUpdate()
     {
-        PlayerInteract();
-#if UNITY_ANDROID
-            //Debug.Log("这里是安卓设备^_^");
-#endif
+        CheckSpeed();
+        #if UNITY_ANDROID
+        #endif
 
-#if UNITY_IPHONE
-            //Debug.Log("这里是苹果设备>_<");
-#endif
+        #if UNITY_IPHONE
+        #endif
 
-#if UNITY_STANDALONE_WIN
+        #if UNITY_STANDALONE_WIN
             PlayerRush();
             PlayerMove();
-            //Debug.Log("我是从Windows的电脑上运行的T_T");
-#endif
+            PlayerInteract();
+        #endif
     }
 
     void OnTriggerEnter2D(Collider2D collider)
@@ -76,18 +74,8 @@ public class Player : MoveObject
         float dy = Input.GetAxis("Vertical");
         Vector3 vector = new Vector3(dx, dy);
 
-		// 检测是否移动 (玩家体力消耗)
-		if(vector != Vector3.zero){
-			// 检测奔跑速度
-			if(GetSpeed() == DEFAULT_SPEED)
-				energy_Current -= energyConsumption_Walk * Time.deltaTime;
-			else
-				energy_Current -= energyConsumption_Rush * Time.deltaTime;
-		}else{
-			energy_Current -= energyConsumption_Idle * Time.deltaTime;
-		}
-		energy_Current = Mathf.Clamp(energy_Current,0,DEFAULT_MAXENERGY);
-		energy_Slider.value = energy_Current;
+        if (vector != Vector3.zero) SetInMoved(true);
+        else SetInMoved(false);
 
         Move(vector);
     }
@@ -97,26 +85,7 @@ public class Player : MoveObject
     {
         if (energy_Current <= 0 || this.GetComponent<Player_BackPack>().GetInCompositeMode()) return;
 
-        //float dx = Input.GetAxis("Horizontal");
-        //float dy = Input.GetAxis("Vertical");
-
         Vector3 vector = dir;
-
-        // 检测是否移动 (玩家体力消耗)
-        if (vector != Vector3.zero)
-        {
-            // 检测奔跑速度
-            if (GetSpeed() == DEFAULT_SPEED)
-                energy_Current -= energyConsumption_Walk * Time.deltaTime;
-            else
-                energy_Current -= energyConsumption_Rush * Time.deltaTime;
-        }
-        else
-        {
-            energy_Current -= energyConsumption_Idle * Time.deltaTime;
-        }
-        energy_Current = Mathf.Clamp(energy_Current, 0, DEFAULT_MAXENERGY);
-        energy_Slider.value = energy_Current;
 
         Move(vector);
     }
@@ -149,6 +118,8 @@ public class Player : MoveObject
 
     // 控制玩家互动
     private void PlayerInteract() {
+        if (inMoved) return;
+
         // 如果玩家正在使用物品，屏蔽地图交互
         if (GetComponent<Player_BackPack>().inSelected)
         {
@@ -194,37 +165,53 @@ public class Player : MoveObject
             return;
         }
 
-        if (true)
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
+        if (colliders.Length > 0)
         {
-            Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
-            if (colliders.Length > 0)
-            {
-                Collider2D item = null;
-                float dis = 0x9f9f9f9f;
+            Collider2D item = null;
+            float dis = 0x9f9f9f9f;
 
-                for (int i = 0; i < colliders.Length; i++)
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                if (!colliders[i].tag.Contains("Item"))
+                    continue;
+                else
                 {
-                    if (!colliders[i].tag.Contains("Item"))
-                        continue;
-                    else
+                    if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
                     {
-                        if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
-                        {
-                            dis = Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position);
-                            item = colliders[i];
-                        }
+                        dis = Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position);
+                        item = colliders[i];
                     }
                 }
-
-                if (item == null) { return; }
-                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
             }
+
+            if (item == null) { return; }
+            else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
         }
     }
 
     // 增加体力
     public void AddEnergy(float _value) {
         energy_Current += _value;
+    }
+
+    // 检测当前速度
+    private void CheckSpeed() {
+        // 检测是否移动 (玩家体力消耗)
+        if (GetInMoved())
+        {
+            // 检测奔跑速度
+            if (GetSpeed() == DEFAULT_SPEED)
+                energy_Current -= energyConsumption_Walk * Time.deltaTime;
+            else
+                energy_Current -= energyConsumption_Rush * Time.deltaTime;
+        }
+        else
+        {
+            energy_Current -= energyConsumption_Idle * Time.deltaTime;
+        }
+        energy_Current = Mathf.Clamp(energy_Current, 0, DEFAULT_MAXENERGY);
+        energy_Slider.value = energy_Current;
     }
 
     public void SetInMoved(bool _moved) { inMoved = _moved; }

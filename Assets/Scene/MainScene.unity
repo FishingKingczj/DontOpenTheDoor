@@ -1391,16 +1391,6 @@ PrefabInstance:
       propertyPath: right
       value: 
       objectReference: {fileID: 1477354617}
-    - target: {fileID: 2630681781149355861, guid: c29f10f1084682d489bd372c0dd95cbf,
-        type: 3}
-      propertyPath: inLocked
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2630681781149355861, guid: c29f10f1084682d489bd372c0dd95cbf,
-        type: 3}
-      propertyPath: pairingValue
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 2630681780745084997, guid: c29f10f1084682d489bd372c0dd95cbf,
         type: 3}
       propertyPath: inLocked
@@ -1410,6 +1400,16 @@ PrefabInstance:
         type: 3}
       propertyPath: pairingValue
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2630681781149355861, guid: c29f10f1084682d489bd372c0dd95cbf,
+        type: 3}
+      propertyPath: inLocked
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2630681781149355861, guid: c29f10f1084682d489bd372c0dd95cbf,
+        type: 3}
+      propertyPath: pairingValue
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c29f10f1084682d489bd372c0dd95cbf, type: 3}
@@ -3146,7 +3146,7 @@ PrefabInstance:
         type: 3}
       propertyPath: mainCamera
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 519420030}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a7949bdeb50290245a7022d16d907c75, type: 3}
 --- !u!4 &1420426737 stripped
