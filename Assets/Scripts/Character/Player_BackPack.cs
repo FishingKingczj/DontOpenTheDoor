@@ -382,7 +382,7 @@ public class Player_BackPack : MonoBehaviour
     // 选中物品
     public void Selected(int _index) 
     {
-        if (inUsed) return;
+        if (inUsed || inCompositeMode) return;
 
         if (item_Group[_index - 1] != null) {
             // 选择
@@ -402,6 +402,12 @@ public class Player_BackPack : MonoBehaviour
 
         if (selectIndex.Count != 0) inSelected = true;
         else inSelected = false;
+
+        // 调用丢弃按钮
+        if (selectIndex.Count == 1) {
+            GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(true);
+        }
+        else GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(false);
     }
 
     // 重设所有选中提示
