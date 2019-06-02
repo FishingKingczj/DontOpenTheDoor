@@ -93,8 +93,8 @@ public class Monster : MonoBehaviour
         }
         else if (state.intentionType.Equals(MonsterState.attack))
         {
-            Debug.Log("Monster is attacking!!!!");
-            SceneManager.LoadScene(0);
+            //Debug.Log("Monster is attacking!!!!");
+            //SceneManager.LoadScene(0);
         }
         else if (state.intentionType.Equals(MonsterState.goBack))
         {
@@ -173,8 +173,12 @@ public class Monster : MonoBehaviour
                 if (Vector2.Distance((Vector2) feeledObject.transform.position, (Vector2) transform.position)< monster_attackScale)
                     state.issueType = MonsterState.canAttack;
             }
+
+            // 触发逃脱模式
+            Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
+            this.GetComponent<Monster_Battle>().StartAttack(feeledObject);
         }
-        Debug.Log(state.issueType);
+        //Debug.Log(state.issueType);
     }
 
     void OnTriggerStay2D(Collider2D collider)
@@ -197,7 +201,7 @@ public class Monster : MonoBehaviour
                     state.issueType = MonsterState.canAttack;
             }
         }
-        Debug.Log(state.issueType);
+        //Debug.Log(state.issueType);
     }
 
     void OnTriggerExit2D(Collider2D collider)
@@ -214,7 +218,7 @@ public class Monster : MonoBehaviour
                     state.issueType = MonsterState.seeNothing;
             }
         }
-        Debug.Log(state.issueType);
+        //Debug.Log(state.issueType);
     }
 }
 

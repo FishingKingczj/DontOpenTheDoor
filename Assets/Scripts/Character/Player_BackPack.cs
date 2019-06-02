@@ -774,4 +774,24 @@ public class Player_BackPack : MonoBehaviour
     }
 
     public bool GetInCompositeMode() { return inCompositeMode; }
+
+    // 输出变量面板
+    public void Check() {
+        if (Time.timeScale == 0)
+        {
+            Time.timeScale = 1.0f;
+            GameObject.Find("Text_Debug").GetComponent<Text>().text = null;
+        }
+        else {
+            Time.timeScale = 0;
+
+            string a = null;
+            a += "In Selected : " + inSelected + '\n';
+            a += "In Used : " + inUsed + '\n';
+            a += "In Operated : " + inOperated + '\n';
+            a += "In CompositeMode : " + inCompositeMode + '\n';
+
+            GameObject.Find("Text_Debug").GetComponent<Text>().text = a;
+        }
+    }
 }

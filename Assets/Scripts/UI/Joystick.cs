@@ -8,10 +8,14 @@ public class Joystick : ScrollRect
     public Player player;
     private Vector2 forceVector;
     protected float radius;
-    protected float radius_Rush = 0.7f;
+    protected float radius_Rush = 0.5f;
 
     public void FixedUpdate()
     {
+        if (player.GetInEscape()) {
+            return;
+        }
+
         if (forceVector != Vector2.zero) {
             player.PlayerMove(new Vector3(forceVector.x, forceVector.y, 0));
         }
@@ -62,5 +66,9 @@ public class Joystick : ScrollRect
         forceVector = Vector2.zero;
 
         player.SetInMoved(false);
+    }
+
+    public Vector2 GetVector() {
+        return forceVector;
     }
 }

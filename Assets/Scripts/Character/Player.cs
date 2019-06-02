@@ -24,6 +24,22 @@ public class Player : MoveObject
     [Header("Movement varible")]
     public bool inMoved = false;
 
+    [Header("EscapeMode varible")]
+    public GameObject monster;
+
+    public bool inEscape = false;
+
+    [Range(0,MAXESCAPEPOINT)]
+    public float escapePoint = 0.0f;
+
+    private const float STARTESCAPEUSAGETIME = 1.0f;
+    private const float ESCAPEPOINTCOST = 3.0f;
+    private const float MAXESCAPEPOINT = 50.0f;
+    public float timer_StartEscape = STARTESCAPEUSAGETIME;
+
+    public Slider escapePoint_Slider;
+    public Joystick joystick;
+
     private const float DEFAULT_SPEED = 1f;
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
 
@@ -32,23 +48,34 @@ public class Player : MoveObject
         //box.radius = interaction_Range;
         //box.isTrigger = true;
 
-        energy_Slider = GameObject.Find("slider_Energy").GetComponent<Slider>();
-	}
+        energy_Slider = GameObject.Find("Slider_Energy").GetComponent<Slider>();
+
+        escapePoint_Slider = GameObject.Find("Canvas_UI").transform.Find("Slider_EscapePoint").gameObject.GetComponent<Slider>();
+
+
+        joystick = GameObject.Find("Joystick").GetComponent<Joystick>();
+    }
 
     void FixedUpdate()
     {
+        if (inEscape) {
+            Escape();
+            return;
+        }
+
         CheckSpeed();
-        #if UNITY_ANDROID
-        #endif
 
-        #if UNITY_IPHONE
-        #endif
+#if UNITY_ANDROID
+#endif
 
-        #if UNITY_STANDALONE_WIN
+#if UNITY_IPHONE
+#endif
+
+#if UNITY_STANDALONE_WIN
             PlayerRush();
             PlayerMove();
             PlayerInteract();
-        #endif
+#endif
     }
 
     void OnTriggerEnter2D(Collider2D collider)
@@ -118,7 +145,7 @@ public class Player : MoveObject
 
     // 控制玩家互动
     private void PlayerInteract() {
-        if (inMoved) return;
+        if (inMoved || inEscape) return;
 
         // 如果玩家正在使用物品，屏蔽地图交互
         if (GetComponent<Player_BackPack>().inSelected)
@@ -157,7 +184,7 @@ public class Player : MoveObject
     // 控制玩家互动(移动端)
     public void PlayerInteract(int _index)
     {
-        if (inMoved) return;
+        if (inMoved || inEscape) return;
 
         // 如果玩家正在使用物品，屏蔽地图交互
         if (GetComponent<Player_BackPack>().inSelected)
@@ -191,8 +218,23 @@ public class Player : MoveObject
     }
 
     // 增加体力
-    public void AddEnergy(float _value) {
+    public void AddEnergy(float _value = 1) {
         energy_Current += _value;
+        energy_Slider.value = energy_Current;
+    }
+    // 减少体力
+    public void ReduceEnergy(float _value = 1) {
+        energy_Current -= _value;
+        energy_Slider.value = energy_Current;
+    }
+    // 增加逃生点
+    public void AddEscapePoint(float _value = 1) {
+        if(inEscape && (joystick.GetVector() == Vector2.zero))
+        escapePoint += _value;
+    }
+    // 减少逃生点
+    public void ReduceEscapePoint(float _value = 1) {
+        escapePoint -= _value;
     }
 
     // 检测当前速度
@@ -214,6 +256,65 @@ public class Player : MoveObject
         energy_Slider.value = energy_Current;
     }
 
+    // 玩家格挡
+    public void PlayerBlock() {
+        monster.SendMessage("PlayerBlock", SendMessageOptions.DontRequireReceiver);
+    }
+
+    // 进入/退出 逃脱模式
+    public void EnterEscapeMode(GameObject _monster) {
+        Debug.Log("玩家进入逃生模式");
+        escapePoint = 0;
+        monster = _monster;
+        inEscape = true;
+
+        timer_StartEscape = STARTESCAPEUSAGETIME;
+
+        GameObject.Find("Canvas_UI").transform.Find("Button_Block").gameObject.SetActive(true);
+        GameObject.Find("Canvas_UI").transform.Find("Slider_EscapePoint").gameObject.SetActive(true);
+
+        // 清除背包中任意操作
+        this.GetComponent<Player_BackPack>().ExitMultipleSelectMode();
+    }
+    public void ExitEscapeMode() {
+        Debug.Log("玩家离开逃生模式");
+        monster.SendMessage("EndAttack", SendMessageOptions.DontRequireReceiver);
+
+        monster = null;
+        inEscape = false;
+
+        GameObject.Find("Canvas_UI").transform.Find("Button_Block").gameObject.SetActive(false);
+        GameObject.Find("Canvas_UI").transform.Find("Slider_EscapePoint").gameObject.SetActive(false);
+    }
+
+    // 逃脱模式检测
+    public void Escape()
+    {
+        if (timer_StartEscape <= 0)
+        {
+            escapePoint -= ESCAPEPOINTCOST * Time.deltaTime;
+
+            if (escapePoint <= 0)
+            {
+               // Debug.Log("玩家死亡 逃生点 0");
+               // ExitEscapeMode();
+            }
+
+            else if (escapePoint >= 50) {
+                Debug.Log("玩家逃脱 逃生点 50");
+                ExitEscapeMode();
+            }
+        }
+        else
+        {
+            timer_StartEscape -= Time.deltaTime;
+        }
+
+        escapePoint_Slider.value = escapePoint;
+    }
+
     public void SetInMoved(bool _moved) { inMoved = _moved; }
     public bool GetInMoved() { return inMoved; }
+
+    public bool GetInEscape() { return inEscape; }
 }
