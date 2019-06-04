@@ -318,7 +318,6 @@ public class Monster_Battle : MonoBehaviour
         // 正在执行攻击序列中
         if (inAttackSequence && !finishedJudgement)
         {
-            Debug.Log("玩家格挡");
             blocked = true;
             player.SendMessage("ReduceEnergy", 1,SendMessageOptions.DontRequireReceiver); // 固定减少体力值
         }
@@ -507,33 +506,11 @@ public class Monster_Battle : MonoBehaviour
                         {
                             if (blocked)
                             {
-                                if (joystick.GetVector().x > 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.PerfectBlock ? currentPlayerJudgement : Judgement.PerfectBlock;
-                                }
-                                else if (joystick.GetVector().x < 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
-                                }
-                                else if (joystick.GetVector().x == 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
-                                }
+                                currentPlayerJudgement = currentPlayerJudgement > Judgement.PerfectBlock ? currentPlayerJudgement : Judgement.PerfectBlock;
                             }
                             else
                             {
-                                if (joystick.GetVector().x > 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
-                                }
-                                else if (joystick.GetVector().x < 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
-                                }
-                                else if (joystick.GetVector().x == 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
-                                }
+                                currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
                             }
 
                             break;
@@ -543,33 +520,11 @@ public class Monster_Battle : MonoBehaviour
                         {
                             if (blocked)
                             {
-                                if (joystick.GetVector().x > 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
-                                }
-                                else if (joystick.GetVector().x < 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
-                                }
-                                else if (joystick.GetVector().x == 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
-                                }
+                                currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
                             }
                             else
                             {
-                                if (joystick.GetVector().x > 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
-                                }
-                                else if (joystick.GetVector().x < 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
-                                }
-                                else if (joystick.GetVector().x == 0)
-                                {
-                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
-                                }
+                                currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
                             }
                         }
 
@@ -595,7 +550,7 @@ public class Monster_Battle : MonoBehaviour
                     break;
                 }
             case Judgement.Block: {
-                    Debug.Log("玩家格挡");
+                    Debug.Log("玩家普通格挡");
                     break;
                 }
             case Judgement.Hitted: {

@@ -267,8 +267,8 @@ public class Player : MoveObject
         this.GetComponent<Player_BackPack>().DisableBackpack();
 
         Debug.Log("玩家进入逃生模式");
-        escapePoint = 0;
-        escapePoint_Slider.value = 0;
+        escapePoint = 25.0f;
+        escapePoint_Slider.value = escapePoint;
         monster = _monster;
         inEscape = true;
 
@@ -302,8 +302,8 @@ public class Player : MoveObject
 
             if (escapePoint <= 0)
             {
-               // Debug.Log("玩家死亡 逃生点 0");
-               // ExitEscapeMode();
+                //Debug.Log("玩家死亡 逃生点 0");
+                //ExitEscapeMode();
             }
 
             else if (escapePoint >= 50) {

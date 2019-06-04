@@ -30,6 +30,7 @@ public class QTE_Arrow : MonoBehaviour
 
         if (timer_BeforeAttack <= 0) {
             image.fillOrigin = 1;
+            image.color = Color.red;
 
             if (timer_Attack <= 0)
             {
@@ -41,12 +42,7 @@ public class QTE_Arrow : MonoBehaviour
             }
         }
         else{
-            Color color = image.color;
             timer_BeforeAttack -= (Time.deltaTime);
-            color.g -= (Time.deltaTime / time_BeforeAttack);
-            color.b -= (Time.deltaTime / time_BeforeAttack);
-            image.color = color;
-
             image.fillAmount += (Time.deltaTime / time_BeforeAttack);
         }
     }
