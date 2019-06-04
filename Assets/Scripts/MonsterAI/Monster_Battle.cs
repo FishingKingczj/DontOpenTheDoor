@@ -66,14 +66,15 @@ public class Monster_Battle : MonoBehaviour
 
     public List<float> time_CurrentAttackSequenceStart;
     public List<float> time_CurrentAttackSequenceStartAttack;
-    public List<float> time_CurrentAttackSequencePerfectBlock;
+    public List<float> time_CurrentAttackSequencePerfectBlockEnd;
+    public List<float> time_CurrentAttackSequenceEnd;
 
     [Header("Player Infomation")]
     public GameObject player;
     public Joystick joystick;
 
-    public bool feedback = false;
-    public bool block = false;
+    public bool finishedJudgement = false;
+    public bool blocked = false;
 
     public enum Judgement {
         None = -1,
@@ -87,7 +88,7 @@ public class Monster_Battle : MonoBehaviour
 
     void Start()
     {
-        joystick = GameObject.Find("Joystick").GetComponent<Joystick>();
+        joystick = GameObject.Find("Canvas_UI").transform.Find("Joystick").gameObject.GetComponent<Joystick>();
         attackGroupSize = attackGroup.Count;
     }
 
@@ -124,9 +125,29 @@ public class Monster_Battle : MonoBehaviour
                         else {
                             timer_CurrentAttackSequence += Time.deltaTime;
 
-                            //检测玩家操作
+                            //检测玩家QTE操作
                             CheckPlayerOperation(currentAttackType);
-                                
+
+                            // 到达 攻击结束点(一段攻击的最终点)
+                            if (time_CurrentAttackSequenceEnd.Count != 0 && timer_CurrentAttackSequence >= time_CurrentAttackSequenceEnd[0])
+                            {
+                                Debug.Log("攻击结束");
+
+                                time_CurrentAttackSequenceEnd.RemoveAt(0);
+                                inAttackingJudgment = false;
+
+                                // 执行检测判定结果
+                                if (!finishedJudgement)
+                                {
+                                    ExecutePlayerJudgement(currentAttackType);
+                                }
+
+                                // 重设判定变量
+                                finishedJudgement = false;
+                                blocked = false;
+                                currentPlayerJudgement = Judgement.None;
+                            }
+
                             //到达 起始点(同时也为攻击判定的结束点)
                             if (time_CurrentAttackSequenceStart.Count != 0 && timer_CurrentAttackSequence >= time_CurrentAttackSequenceStart[0]) {
                                 Debug.Log("攻击前摇开始 攻击类型 " + currentAttackSequence[0]);
@@ -134,15 +155,10 @@ public class Monster_Battle : MonoBehaviour
                                 currentAttackType = currentAttackSequence[0];
                                 time_CurrentAttackSequenceStart.RemoveAt(0);
 
-                                feedback = false;
-                                inAttackingJudgment = false;
-
-                                currentPlayerJudgement = Judgement.None;
-
                                 // 生成提示(测试用)
                                 GameObject arrow = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UI/Arrow"));
                                 arrow.transform.SetParent(GameObject.Find("Canvas_UI").GetComponent<Transform>());
-                                arrow.GetComponent<QTE_Arrow>().Initial(attackType[currentAttackSequence[0]].time_BefroeAttack, attackType[currentAttackSequence[0]].time_Attack, currentAttackSequence[0]);
+                                arrow.GetComponent<QTE_Arrow>().Initial(attackType[currentAttackType].time_BefroeAttack, attackType[currentAttackType].time_Attack,currentAttackType);
                                 arrow.transform.position = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 2, 0);
 
                                 currentAttackSequence.RemoveAt(0);
@@ -159,12 +175,18 @@ public class Monster_Battle : MonoBehaviour
                             }
 
                             //到达 完美判定结束点
-                            if (time_CurrentAttackSequencePerfectBlock.Count != 0 && timer_CurrentAttackSequence >= time_CurrentAttackSequencePerfectBlock[0]) {
+                            if (time_CurrentAttackSequencePerfectBlockEnd.Count != 0 && timer_CurrentAttackSequence >= time_CurrentAttackSequencePerfectBlockEnd[0]) {
                                 Debug.Log("完美判定结束");
 
                                 inPerfectBlockJudgement = false;
 
-                                time_CurrentAttackSequencePerfectBlock.RemoveAt(0);
+                                time_CurrentAttackSequencePerfectBlockEnd.RemoveAt(0);
+
+                                // 执行检测判定优先级结果
+                                if (currentPlayerJudgement >= Judgement.Hitted && !finishedJudgement) {
+                                    Debug.Log("完美时间段内 得到 高优先级 判断");
+                                    ExecutePlayerJudgement(currentAttackType);
+                                }
                             }
                         }
                     }
@@ -196,6 +218,21 @@ public class Monster_Battle : MonoBehaviour
         timer_CurrentAttackSequence = 0;
         time_AttackCommand = 0;
         timer_CurrentAttackSequence = 0;
+
+        currentAttackType = -1;
+
+        time_CurrentAttackSequenceStart.Clear();
+        time_CurrentAttackSequenceStartAttack.Clear();
+        time_CurrentAttackSequencePerfectBlockEnd.Clear();
+        time_CurrentAttackSequenceEnd.Clear();
+
+        inAttackSequence = false;
+        inAttackingJudgment = false;
+        inAttackSequence = false;
+        blocked = false;
+        finishedJudgement = false;
+
+        currentPlayerJudgement = Judgement.None;
     }
 
     // 载入攻击指令
@@ -248,8 +285,9 @@ public class Monster_Battle : MonoBehaviour
         timer_CurrentAttackSequence = 0;
 
         time_CurrentAttackSequenceStart.Clear();
-        time_CurrentAttackSequencePerfectBlock.Clear();
+        time_CurrentAttackSequencePerfectBlockEnd.Clear();
         time_CurrentAttackSequenceStartAttack.Clear();
+        time_CurrentAttackSequenceEnd.Clear();
 
         // 获取攻击指令列表首个指令并删除指令
         int index = attackCommandSequenceList[0];
@@ -265,7 +303,9 @@ public class Monster_Battle : MonoBehaviour
             // 生成攻击序列特殊分段点(攻击开始点)
             time_CurrentAttackSequenceStartAttack.Add(attackType[type].time_BefroeAttack + time_CurrentAttackSequence);
             // 生成攻击序列特殊分段点(完美格挡点)
-            time_CurrentAttackSequencePerfectBlock.Add(attackType[type].time_BefroeAttack + attackType[type].time_PerfectBlock + time_CurrentAttackSequence);
+            time_CurrentAttackSequencePerfectBlockEnd.Add(attackType[type].time_BefroeAttack + attackType[type].time_PerfectBlock + time_CurrentAttackSequence);
+            // 生成攻击序列特殊分段点 (攻击结束点)
+            time_CurrentAttackSequenceEnd.Add(time_CurrentAttackSequence + attackType[attackSequence[index].attackType[i]].time_BefroeAttack + attackType[attackSequence[index].attackType[i]].time_Attack);
 
             // 生成攻击序列时间线
             time_CurrentAttackSequence += attackType[attackSequence[index].attackType[i]].time_BefroeAttack + attackType[attackSequence[index].attackType[i]].time_Attack;
@@ -276,48 +316,301 @@ public class Monster_Battle : MonoBehaviour
     // 玩家格挡
     public void PlayerBlock() {
         // 正在执行攻击序列中
-        if (inAttackSequence && !feedback)
+        if (inAttackSequence && !finishedJudgement)
         {
             Debug.Log("玩家格挡");
-            feedback = true;
-            block = true;
-            player.SendMessage("ReduceEnergy", SendMessageOptions.DontRequireReceiver); // 固定减少体力值
+            blocked = true;
+            player.SendMessage("ReduceEnergy", 1,SendMessageOptions.DontRequireReceiver); // 固定减少体力值
         }
     }
 
-    // 检测玩家QTE决定操作 0->左 1->右 2-全屏
+    // 检测玩家QTE决定操作 0->左 1->右 2->全屏
     public void CheckPlayerOperation(int _dir) {
-        // 玩家操作检测
-        if (inAttackingJudgment && !feedback)
-        {
-            // 完美时间段判定
-            if (inPerfectBlockJudgement)
-            {
+        if (finishedJudgement) return;
 
+        // 前摇期间格党
+        if(!inAttackingJudgment && !inPerfectBlockJudgement){
+            if (blocked == true) {
+                Debug.Log("玩家在前摇期间内格挡");
+                currentPlayerJudgement = Judgement.Block;
+                ExecutePlayerJudgement(_dir);
+                return;
             }
-            // 攻击时间段中其他时间段判定
+        }
+
+        // 攻击期间内操作判定
+        switch (_dir) {
+            case 0: {
+                    // 玩家操作检测
+                    if (inAttackingJudgment)
+                    {
+                        // 完美时间段判定
+                        if (inPerfectBlockJudgement)
+                        {
+                            if (blocked)
+                            {
+                                if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.PerfectBlock ? currentPlayerJudgement : Judgement.PerfectBlock;
+                                }
+                                else if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                            }
+                            else
+                            {
+                                if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                                else if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                            }
+
+                            break;
+                        }
+                        // 攻击时间段中其他时间段判定
+                        else
+                        {
+                            if (blocked)
+                            {
+                                if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement >Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                                else if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                            }
+                            else
+                            {
+                                if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                                else if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                            }
+                        }
+
+                        
+                    }
+                    break;
+                }
+            case 1: {
+                    // 玩家操作检测
+                    if (inAttackingJudgment)
+                    {
+                        // 完美时间段判定
+                        if (inPerfectBlockJudgement)
+                        {
+                            if (blocked)
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.PerfectBlock ? currentPlayerJudgement : Judgement.PerfectBlock;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                            }
+                            else
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                            }
+
+                            break;
+                        }
+                        // 攻击时间段中其他时间段判定
+                        else
+                        {
+                            if (blocked)
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                            }
+                            else
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                            }
+                        }
+
+
+                    }
+                    break;
+                }
+            case 2: {
+                    // 玩家操作检测
+                    if (inAttackingJudgment)
+                    {
+                        // 完美时间段判定
+                        if (inPerfectBlockJudgement)
+                        {
+                            if (blocked)
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.PerfectBlock ? currentPlayerJudgement : Judgement.PerfectBlock;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                            }
+                            else
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                            }
+
+                            break;
+                        }
+                        // 攻击时间段中其他时间段判定
+                        else
+                        {
+                            if (blocked)
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Block ? currentPlayerJudgement : Judgement.Block;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.HittedBlock ? currentPlayerJudgement : Judgement.HittedBlock;
+                                }
+                            }
+                            else
+                            {
+                                if (joystick.GetVector().x > 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                                else if (joystick.GetVector().x < 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Roll ? currentPlayerJudgement : Judgement.Roll;
+                                }
+                                else if (joystick.GetVector().x == 0)
+                                {
+                                    currentPlayerJudgement = currentPlayerJudgement > Judgement.Hitted ? currentPlayerJudgement : Judgement.Hitted;
+                                }
+                            }
+                        }
+
+
+                    }
+                    break;
+                }
+            default:break;
         }
     }
 
-    // 执行玩家操作判定结果
-    public void PlayerJudgementResult() {
+    // 执行玩家操作判定结果并锁定判定 0->左 1->右 2->全屏
+    public void ExecutePlayerJudgement(int _dir) {
+        finishedJudgement = true;
+
         switch (currentPlayerJudgement) {
             case Judgement.None: {
+                    Debug.Log("None");
                     break;
                 }
             case Judgement.Roll: {
+                    Debug.Log("玩家翻滚");
                     break;
                 }
             case Judgement.Block: {
+                    Debug.Log("玩家格挡");
                     break;
                 }
             case Judgement.Hitted: {
+                    Debug.Log("玩家被击中 减少逃生点 : " + attackType[_dir].damage);
+                    player.SendMessage("ReduceEscapePoint", attackType[_dir].damage,SendMessageOptions.DontRequireReceiver);
                     break;
                 }
             case Judgement.HittedBlock: {
+                    Debug.Log("玩家格挡受击 额外减少体力 : " + attackType[_dir].energyExpendIfBlock);
+                    player.SendMessage("ReduceEnergy", attackType[_dir].energyExpendIfBlock, SendMessageOptions.DontRequireReceiver);
                     break;
                 }
             case Judgement.PerfectBlock: {
+                    Debug.Log("玩家完美格挡 增加逃生点 : 20");
+                    player.SendMessage("AddEscapePoint", 20, SendMessageOptions.DontRequireReceiver);
                     break;
                 }
             default:break;

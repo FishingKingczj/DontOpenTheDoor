@@ -229,11 +229,12 @@ public class Player : MoveObject
     }
     // 增加逃生点
     public void AddEscapePoint(float _value = 1) {
-        if(inEscape && (joystick.GetVector() == Vector2.zero))
+        if(inEscape)
         escapePoint += _value;
     }
     // 减少逃生点
     public void ReduceEscapePoint(float _value = 1) {
+        if(inEscape)
         escapePoint -= _value;
     }
 
@@ -263,8 +264,11 @@ public class Player : MoveObject
 
     // 进入/退出 逃脱模式
     public void EnterEscapeMode(GameObject _monster) {
+        this.GetComponent<Player_BackPack>().DisableBackpack();
+
         Debug.Log("玩家进入逃生模式");
         escapePoint = 0;
+        escapePoint_Slider.value = 0;
         monster = _monster;
         inEscape = true;
 
@@ -277,6 +281,8 @@ public class Player : MoveObject
         this.GetComponent<Player_BackPack>().ExitMultipleSelectMode();
     }
     public void ExitEscapeMode() {
+        this.GetComponent<Player_BackPack>().EnableBackpack();
+
         Debug.Log("玩家离开逃生模式");
         monster.SendMessage("EndAttack", SendMessageOptions.DontRequireReceiver);
 

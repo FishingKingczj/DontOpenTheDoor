@@ -534,21 +534,26 @@ MonoBehaviour:
     time_Attack: 1
     time_PerfectBlock: 0.5
   inAttack: 0
-  inQte: 0
   attackCommandTimeList: []
   attackCommandSequenceList: 
   time_AttackCommand: 0
   timer_AttackCommand: 0
+  currentAttackType: -1
+  inAttackSequence: 0
+  inAttackingJudgment: 0
+  inPerfectBlockJudgement: 0
   currentAttackSequence: 
   time_CurrentAttackSequence: 0
   timer_CurrentAttackSequence: 0
   time_CurrentAttackSequenceStart: []
   time_CurrentAttackSequenceStartAttack: []
-  time_CurrentAttackSequencePerfectBlock: []
+  time_CurrentAttackSequencePerfectBlockEnd: []
+  time_CurrentAttackSequenceEnd: []
   player: {fileID: 0}
   joystick: {fileID: 0}
+  finishedJudgement: 0
   block: 0
-  feedback: 0
+  currentPlayerJudgement: -1
 --- !u!114 &343739072 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2630681780947982638, guid: c29f10f1084682d489bd372c0dd95cbf,
@@ -3080,7 +3085,7 @@ PrefabInstance:
     - target: {fileID: 724925507482224220, guid: c7bf0aa3346b93e409beef6a245dada5,
         type: 3}
       propertyPath: m_Name
-      value: Canvas_BackPack
+      value: Canvas_Backpack
       objectReference: {fileID: 0}
     - target: {fileID: 724925507482224216, guid: c7bf0aa3346b93e409beef6a245dada5,
         type: 3}

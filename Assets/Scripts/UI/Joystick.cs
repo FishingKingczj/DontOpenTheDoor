@@ -13,6 +13,19 @@ public class Joystick : ScrollRect
     public void FixedUpdate()
     {
         if (player.GetInEscape()) {
+            // QTE测试用
+            if (Input.GetKey(KeyCode.D))
+            {
+                forceVector.x = 1;
+            }
+            else if (Input.GetKey(KeyCode.A))
+            {
+                forceVector.x = -1;
+            }
+            else
+                forceVector.x = 0;
+
+
             return;
         }
 

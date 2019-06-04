@@ -794,4 +794,16 @@ public class Player_BackPack : MonoBehaviour
             GameObject.Find("Text_Debug").GetComponent<Text>().text = a;
         }
     }
+
+    // 禁用背包
+    public void DisableBackpack() {
+        ExitMultipleSelectMode();
+
+        GameObject.Find("Canvas_Backpack").transform.Find("Panel_Box").gameObject.SetActive(false);
+    }
+
+    // 启用背包
+    public void EnableBackpack() {
+        GameObject.Find("Canvas_Backpack").transform.Find("Panel_Box").gameObject.SetActive(true);
+    }
 }
