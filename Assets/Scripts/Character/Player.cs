@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class Player : MoveObject
 {
@@ -302,8 +303,9 @@ public class Player : MoveObject
 
             if (escapePoint <= 0)
             {
-                //Debug.Log("玩家死亡 逃生点 0");
-                //ExitEscapeMode();
+                Debug.Log("玩家死亡 逃生点 0");
+                ExitEscapeMode();
+                SceneManager.LoadScene(0);
             }
 
             else if (escapePoint >= 50) {

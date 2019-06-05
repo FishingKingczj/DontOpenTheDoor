@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class RoomLoader : MonoBehaviour
 {
+    static public int ROOM_SIZE = 24;
     private int UNIT_SIZE = 22;
 
     private List<Room> allRooms;
