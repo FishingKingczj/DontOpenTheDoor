@@ -76,6 +76,9 @@ public class Monster_Battle : MonoBehaviour
     public bool finishedJudgement = false;
     public bool blocked = false;
 
+    [Header("PressurePoint Configuration Variable")]
+    public float pressurePointIncrementWhenHitted = 5.0f;
+
     public enum Judgement {
         None = -1,
         Roll = 0,
@@ -551,15 +554,18 @@ public class Monster_Battle : MonoBehaviour
                 }
             case Judgement.Block: {
                     Debug.Log("玩家普通格挡");
+                    player.SendMessage("AddPressurePoint", pressurePointIncrementWhenHitted, SendMessageOptions.DontRequireReceiver);
                     break;
                 }
             case Judgement.Hitted: {
                     Debug.Log("玩家被击中 减少逃生点 : " + attackType[_dir].damage);
+                    player.SendMessage("AddPressurePoint", pressurePointIncrementWhenHitted, SendMessageOptions.DontRequireReceiver);
                     player.SendMessage("ReduceEscapePoint", attackType[_dir].damage,SendMessageOptions.DontRequireReceiver);
                     break;
                 }
             case Judgement.HittedBlock: {
                     Debug.Log("玩家格挡受击 额外减少体力 : " + attackType[_dir].energyExpendIfBlock);
+                    player.SendMessage("AddPressurePoint", pressurePointIncrementWhenHitted, SendMessageOptions.DontRequireReceiver);
                     player.SendMessage("ReduceEnergy", attackType[_dir].energyExpendIfBlock, SendMessageOptions.DontRequireReceiver);
                     break;
                 }

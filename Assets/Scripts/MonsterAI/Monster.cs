@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 
 public class Monster : MonoBehaviour
 {
+    [Header("player PressureSystem variable")]
+    public bool visiable = false;
+    public float timer_Standard = 1.0f;
+    public float pressurePointIncrement = 1.0f;
+
     //monster parameter
     public float monster_attackTime = 1.0f;
     public float monster_attackScale = 1.0f;
@@ -153,6 +158,8 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (visiable) Timer_AddPressurePoint();
+
         DecisionLayer();
         AciotnLayer();
     }
@@ -219,6 +226,26 @@ public class Monster : MonoBehaviour
             }
         }
         //Debug.Log(state.issueType);
+    }
+
+    private void OnBecameVisible()
+    {
+        visiable = true;
+    }
+    private void OnBecameInvisible()
+    {
+        visiable = false;
+        timer_Standard = 1.0f;
+    }
+
+    private void Timer_AddPressurePoint() {
+            if (timer_Standard <= 0)
+            {
+                GameObject.Find("player").GetComponent<Player_BuffManager>().AddPressurePoint(pressurePointIncrement);
+                timer_Standard = 1.0f;
+            }
+            else
+                timer_Standard -= Time.deltaTime;
     }
 }
 

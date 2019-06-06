@@ -15,6 +15,7 @@ public class Player : MoveObject
 	public float energyConsumption_Idle =  0.33f;
 	public float energyConsumption_Walk =  0.33f;
 	public float energyConsumption_Rush =  5.0f;
+    public float energyConsumption_Extra = 0.0f;
 
     //活力条
 	public Slider energy_Slider;
@@ -35,11 +36,15 @@ public class Player : MoveObject
 
     private const float STARTESCAPEUSAGETIME = 1.0f;
     private const float ESCAPEPOINTCOST = 3.0f;
+    public float extraEscapePointCost = 0.0f;
     private const float MAXESCAPEPOINT = 50.0f;
     public float timer_StartEscape = STARTESCAPEUSAGETIME;
 
     public Slider escapePoint_Slider;
     public Joystick joystick;
+
+    [Header("PressurePoint Configuration Variable")]
+    public float pressurePointIncrementWhenStartQTE = 10.0f;
 
     private const float DEFAULT_SPEED = 1f;
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
@@ -246,13 +251,13 @@ public class Player : MoveObject
         {
             // 检测奔跑速度
             if (GetSpeed() == DEFAULT_SPEED)
-                energy_Current -= energyConsumption_Walk * Time.deltaTime;
+                energy_Current -= (energyConsumption_Walk + energyConsumption_Extra) * Time.deltaTime;
             else
-                energy_Current -= energyConsumption_Rush * Time.deltaTime;
+                energy_Current -= (energyConsumption_Rush + energyConsumption_Extra) * Time.deltaTime;
         }
         else
         {
-            energy_Current -= energyConsumption_Idle * Time.deltaTime;
+            energy_Current -= (energyConsumption_Idle + energyConsumption_Extra) * Time.deltaTime;
         }
         energy_Current = Mathf.Clamp(energy_Current, 0, DEFAULT_MAXENERGY);
         energy_Slider.value = energy_Current;
@@ -278,6 +283,8 @@ public class Player : MoveObject
         GameObject.Find("Canvas_UI").transform.Find("Button_Block").gameObject.SetActive(true);
         GameObject.Find("Canvas_UI").transform.Find("Slider_EscapePoint").gameObject.SetActive(true);
 
+        this.GetComponent<Player_BuffManager>().AddPressurePoint(pressurePointIncrementWhenStartQTE);
+
         // 清除背包中任意操作
         this.GetComponent<Player_BackPack>().ExitMultipleSelectMode();
     }
@@ -299,7 +306,7 @@ public class Player : MoveObject
     {
         if (timer_StartEscape <= 0)
         {
-            escapePoint -= ESCAPEPOINTCOST * Time.deltaTime;
+            escapePoint -= (ESCAPEPOINTCOST + extraEscapePointCost) * Time.deltaTime;
 
             if (escapePoint <= 0)
             {
@@ -323,6 +330,23 @@ public class Player : MoveObject
 
     public void SetInMoved(bool _moved) { inMoved = _moved; }
     public bool GetInMoved() { return inMoved; }
+
+    // 增加/减少 体力额外消耗
+    public void AddEnergyExtraConsumption(float _value) {
+        energyConsumption_Extra += _value;
+    }
+    public void ReduceEnergyExtraConsumption(float _value) {
+        energyConsumption_Extra -= _value;
+    }
+
+    // 增加/减少 逃生点额外消耗
+    public void AddExtraEscapePointCost(float _value) {
+        extraEscapePointCost += _value;
+    }
+    public void ReduceExtraEscapePointCost(float _value)
+    {
+        extraEscapePointCost -= _value;
+    }
 
     public bool GetInEscape() { return inEscape; }
 }

@@ -5,6 +5,12 @@ using UnityEngine.EventSystems;
 
 public class Joystick : ScrollRect
 {
+    public bool controllable;
+    public float timer_ChangeMoveDir = 0.5f;
+
+    public float autoMove_x = 0;
+    public float autoMove_y = 0;
+
     public Player player;
     private Vector2 forceVector;
     protected float radius;
@@ -29,8 +35,14 @@ public class Joystick : ScrollRect
             return;
         }
 
-        if (forceVector != Vector2.zero) {
+        // 可控制状态下玩家进行操作
+        if (controllable)
+        {
+            if(forceVector != Vector2.zero)
             player.PlayerMove(new Vector3(forceVector.x, forceVector.y, 0));
+        }
+        else {
+            AutoMove();
         }
     }
 
@@ -41,6 +53,9 @@ public class Joystick : ScrollRect
         player = GameObject.Find("player").GetComponent<Player>();
         forceVector = Vector2.zero;
         radius = (transform as RectTransform).sizeDelta.x * 0.5f; // 计算摇杆块的半径
+
+        controllable = true;
+        CreateAutoMovementDir();
     }   
 
     public override void OnDrag(PointerEventData eventData)
@@ -83,5 +98,27 @@ public class Joystick : ScrollRect
 
     public Vector2 GetVector() {
         return forceVector;
+    }
+    public void SetControllable(bool _value) {
+        controllable = _value;
+    }
+
+    public void AutoMove() {
+        if (timer_ChangeMoveDir <= 0)
+        {
+            timer_ChangeMoveDir = 1.0f;
+            CreateAutoMovementDir();
+        }
+        else
+        {
+            timer_ChangeMoveDir -= Time.deltaTime;
+        }
+
+        player.PlayerMove(new Vector3(autoMove_x, autoMove_y, 0));
+    }
+
+    public void CreateAutoMovementDir() {
+        autoMove_x = Random.Range(-1.0f, 1.0f);
+        autoMove_y = Random.Range(-1.0f, 1.0f);
     }
 }

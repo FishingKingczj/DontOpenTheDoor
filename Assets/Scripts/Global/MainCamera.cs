@@ -26,6 +26,7 @@ public class MainCamera : MonoBehaviour
         camera = this.GetComponent<Camera>();
         currentRoomCenterPoint = new Vector3(0, 0,-10);
         nextRoomPoint = Vector3.zero;
+
     }
 
     void Update()
