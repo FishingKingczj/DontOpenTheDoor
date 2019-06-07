@@ -167,7 +167,7 @@ public class Monster : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collider)
     {
         GameObject feeledObject = collider.gameObject;
-        if (feeledObject.name.Equals("player")) {
+        if (feeledObject.tag.Equals("Player")) {
             RaycastHit2D[] objects = Physics2D.LinecastAll((Vector2) transform.position, (Vector2)feeledObject.transform.position);
             state.issueType = MonsterState.seePlayer;
             foreach (var obj in objects) {
@@ -191,7 +191,7 @@ public class Monster : MonoBehaviour
     void OnTriggerStay2D(Collider2D collider)
     {
         GameObject feeledObject = collider.gameObject;
-        if (feeledObject.name.Equals("player"))
+        if (feeledObject.tag.Equals("Player"))
         {
             RaycastHit2D[] objects = Physics2D.LinecastAll((Vector2)transform.position, (Vector2)feeledObject.transform.position);
             state.issueType = MonsterState.seePlayer;
@@ -214,7 +214,7 @@ public class Monster : MonoBehaviour
     void OnTriggerExit2D(Collider2D collider)
     {
         GameObject feeledObject = collider.gameObject;
-        if (feeledObject.name.Equals("player"))
+        if (feeledObject.tag.Equals("Player"))
         {
             RaycastHit2D[] objects = Physics2D.LinecastAll((Vector2)transform.position, (Vector2)feeledObject.transform.position);
             foreach (var obj in objects)

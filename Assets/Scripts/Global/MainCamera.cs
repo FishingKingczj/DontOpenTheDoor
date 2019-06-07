@@ -69,7 +69,7 @@ public class MainCamera : MonoBehaviour
             nextRoomPoint = new Vector3(this.transform.position.x, this.transform.position.y - (2 + camera.orthographicSize) - 1, -10);
         }
 
-        currentRoomCenterPoint = target;
+        SetCurrentCenterPoint(target);
     }
 
     public void Follow() {
@@ -84,5 +84,9 @@ public class MainCamera : MonoBehaviour
         position.y = Mathf.Clamp(position.y, currentRoomCenterPoint.y + -(RoomLoader.ROOM_SIZE / 2) + camera.orthographicSize, currentRoomCenterPoint.y + (RoomLoader.ROOM_SIZE / 2) - camera.orthographicSize);
 
         this.transform.position = position;
+    }
+
+    public void SetCurrentCenterPoint(Vector3 _v) {
+        currentRoomCenterPoint = _v;
     }
 }

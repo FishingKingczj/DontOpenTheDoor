@@ -13,7 +13,7 @@ public class Player : MoveObject
 	public float energy_Current = DEFAULT_MAXENERGY;
 
 	public float energyConsumption_Idle =  0.33f;
-	public float energyConsumption_Walk =  0.33f;
+	public float energyConsumption_Run =  0.33f;
 	public float energyConsumption_Rush =  5.0f;
     public float energyConsumption_Extra = 0.0f;
 
@@ -21,10 +21,20 @@ public class Player : MoveObject
 	public Slider energy_Slider;
 
     [Header("Interact varible")]
-    public float interaction_Range = 1.2f;
+    public static float interaction_Range = 1.2f;
 
     [Header("Movement varible")]
     public bool inMoved = false;
+    public CurrentMovement currentMovement = CurrentMovement.Idle;
+
+    public enum CurrentMovement {
+        Idle = 0,
+        Run,
+        Rush
+    }
+
+    private const float DEFAULT_SPEED = 1f;
+    private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
 
     [Header("EscapeMode varible")]
     public GameObject monster;
@@ -46,9 +56,6 @@ public class Player : MoveObject
     [Header("PressurePoint Configuration Variable")]
     public float pressurePointIncrementWhenStartQTE = 10.0f;
 
-    private const float DEFAULT_SPEED = 1f;
-    private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
-
 	void Start(){
         //CircleCollider2D box = gameObject.AddComponent<CircleCollider2D>();
         //box.radius = interaction_Range;
@@ -69,7 +76,7 @@ public class Player : MoveObject
             return;
         }
 
-        CheckSpeed();
+        CheckCurrentMovement();
 
 #if UNITY_ANDROID
 #endif
@@ -107,8 +114,15 @@ public class Player : MoveObject
         float dy = Input.GetAxis("Vertical");
         Vector3 vector = new Vector3(dx, dy);
 
-        if (vector != Vector3.zero) SetInMoved(true);
-        else SetInMoved(false);
+        if (vector != Vector3.zero)
+        {
+            SetInMoved(true);
+            currentMovement = CurrentMovement.Run;
+        }
+        else {
+            SetInMoved(false);
+            currentMovement = CurrentMovement.Idle;
+        }
 
         Move(vector);
     }
@@ -117,6 +131,10 @@ public class Player : MoveObject
     public void PlayerMove(Vector3 dir)
     {
         if (energy_Current <= 0 || this.GetComponent<Player_BackPack>().GetInCompositeMode()) return;
+        if (dir == Vector3.zero) {
+            currentMovement = CurrentMovement.Idle;
+            return;
+        }
 
         Vector3 vector = dir;
 
@@ -128,10 +146,12 @@ public class Player : MoveObject
     {
         if (Input.GetKey(KeyCode.Space))
         {
+            currentMovement = CurrentMovement.Rush;
             setSpeed(RUSH_SPEED);
         }
         else
         {
+            currentMovement = CurrentMovement.Run;
             setSpeed(DEFAULT_SPEED);
         }
     }
@@ -141,10 +161,12 @@ public class Player : MoveObject
     {
         if (inRushed)
         {
+            currentMovement = CurrentMovement.Rush;
             setSpeed(RUSH_SPEED);
         }
         else
         {
+            currentMovement = CurrentMovement.Run;
             setSpeed(DEFAULT_SPEED);
         }
     }
@@ -245,20 +267,24 @@ public class Player : MoveObject
     }
 
     // 检测当前速度
-    private void CheckSpeed() {
+    private void CheckCurrentMovement() {
         // 检测是否移动 (玩家体力消耗)
-        if (GetInMoved())
-        {
-            // 检测奔跑速度
-            if (GetSpeed() == DEFAULT_SPEED)
-                energy_Current -= (energyConsumption_Walk + energyConsumption_Extra) * Time.deltaTime;
-            else
-                energy_Current -= (energyConsumption_Rush + energyConsumption_Extra) * Time.deltaTime;
+        switch (currentMovement) {
+            case CurrentMovement.Idle: {
+                    energy_Current -= (energyConsumption_Idle + energyConsumption_Extra) * Time.deltaTime;
+                    break;
+                }
+            case CurrentMovement.Run: {
+                    energy_Current -= (energyConsumption_Run + energyConsumption_Extra) * Time.deltaTime;
+                    break;
+                }
+            case CurrentMovement.Rush: {
+                    energy_Current -= (energyConsumption_Rush + energyConsumption_Extra) * Time.deltaTime;
+                    break;
+                }
+            default:return;
         }
-        else
-        {
-            energy_Current -= (energyConsumption_Idle + energyConsumption_Extra) * Time.deltaTime;
-        }
+
         energy_Current = Mathf.Clamp(energy_Current, 0, DEFAULT_MAXENERGY);
         energy_Slider.value = energy_Current;
     }

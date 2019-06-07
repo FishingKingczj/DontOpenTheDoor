@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1502428751164143782}
   - component: {fileID: 1502428751164143781}
   m_Layer: 0
-  m_Name: Food
+  m_Name: SceneItem_Food
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &1502428751164143782
 BoxCollider2D:

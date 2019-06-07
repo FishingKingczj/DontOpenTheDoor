@@ -23,26 +23,12 @@ public class Item_Key : Item
         usageTime = 2.0f;
         timer_UsageTime = usageTime;
 
-        progressRing = GameObject.Find("ProgressRing").GetComponent<Image>();
-
-    }
-
-    public override void Interact(GameObject _user)
-    {
-        if (pickable == true)
-        {
-            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id, name, description, pairingValue))
-                Destroy(this.gameObject);
-            else
-            {
-                Debug.Log("背包已满");
-            }
-        }
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     public override void Effect(GameObject _user)
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(_user.transform.position, _user.GetComponent<Player>().interaction_Range);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(_user.transform.position,Player.interaction_Range);
         if (colliders.Length > 0)
         {
             foreach (Collider2D t in colliders)
@@ -71,7 +57,7 @@ public class Item_Key : Item
 
     public override void Use(GameObject _user)
     {
-        Collider2D[] colliders = Physics2D.OverlapCircleAll(_user.transform.position, _user.GetComponent<Player>().interaction_Range);
+        Collider2D[] colliders = Physics2D.OverlapCircleAll(_user.transform.position, Player.interaction_Range);
         if (colliders.Length > 0)
         {
             foreach (Collider2D t in colliders)
@@ -102,12 +88,10 @@ public class Item_Key : Item
                     progressRing.fillAmount = (usageTime - timer_UsageTime) / usageTime;
                     return;
                 }
-                else
-                {
-                    Use_Reset();
-                }
             }
         }
+
+        Use_Reset();
     }
 
     // 设置钥匙配对值

@@ -17,7 +17,7 @@ public class Room : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.tag.Equals("Player"))
+        if (collider.tag.Contains("Player"))
         {
             RoomLoader loader = GameObject.Find("RoomLoader").GetComponent<RoomLoader>();
             loader.Enter(this, null);

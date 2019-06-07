@@ -71,11 +71,13 @@ public class Player_BackPack : MonoBehaviour
             text_StorageAmount[j++] = t.GetComponentInChildren<Text>();
         }
 
-        progressRing = GameObject.Find("Canvas_UI").transform.Find("Button_Interact").transform.Find("ProgressRing").gameObject.GetComponent<Image>();
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").gameObject.GetComponent<Image>();
     }
 
     void FixedUpdate()
     {
+
+        UseItem();
 
         #if UNITY_ANDROID
             UseItem(1); // 移动端(带任意整形参数) 电脑端(无参)
@@ -102,7 +104,7 @@ public class Player_BackPack : MonoBehaviour
         }
     }
 
-    // 添加道具 true->背包有余位 false->背包已满
+    // 添加道具 true->背包有余位 false->背包已满 (含特殊处理)
     public bool AddItem(GameObject _item, int _maxStorageAmount, int _id, string _name, string _description) {
         // 尝试寻找重复道具并叠加
         for (int i = 0; i < maxStorageAmount; i++) {
@@ -121,40 +123,7 @@ public class Player_BackPack : MonoBehaviour
                 if (item == null) return false;
 
                 // 物品信息更新
-                item.transform.parent = backpack[j].transform;
-                item.transform.localPosition = Vector3.zero;
-                item.transform.localScale = Vector3.one;
-                float width = backpack[j].GetComponent<RectTransform>().sizeDelta.x;
-                float height = backpack[j].GetComponent<RectTransform>().sizeDelta.y;
-                item.GetComponent<RectTransform>().sizeDelta = new Vector2(width - 10, height - 10);
-                item.transform.SetAsFirstSibling();
-
-                item_Group[j] = item;
-                ReflashItemAmount(j,1);
-                item_Id[j] = _id;
-                item_Name[j] = _name;
-                item_Description[j] = _description;
-
-                numberOfItem++;
-                return true;
-            }
-        }
-
-        return false;
-    }
-    // 添加道具(针对带特殊参数的key类道具)
-    public bool AddItem(GameObject _item, int _maxStorageAmount, int _id , string _name, string _description,int _value)
-    {
-        // 尝试寻找空位置
-        for (int j = 0; j < maxStorageAmount; j++)
-        {
-            if (item_Group[j] == null)
-            {
-                GameObject item = LoadItemToBackpack(_id);
-                if (item == null) return false;
-
-                // 物品信息更新
-                item.transform.parent = backpack[j].transform;
+                item.transform.SetParent(backpack[j].transform);
                 item.transform.localPosition = Vector3.zero;
                 item.transform.localScale = Vector3.one;
                 float width = backpack[j].GetComponent<RectTransform>().sizeDelta.x;
@@ -163,17 +132,31 @@ public class Player_BackPack : MonoBehaviour
                 item.transform.SetAsFirstSibling();
 
                 // 特殊物品处理
-                if (_name.Contains("Key")) {
-                    item.GetComponent<Item_Key>().pairingValue = _value;
+                if (_name.Equals("Key"))
+                {
+                    item.GetComponent<Item_Key>().pairingValue = _item.GetComponent<Item_Key>().GetPairingValue();
+                }
+                else if (_name.Equals("Transporter"))
+                {
+                    item.GetComponent<Item_Transporter>().SetStartPosition(_item.GetComponent<Item_Transporter>().GetStartPosition());
+                    item.GetComponent<Item_Transporter>().SetEndPosition(_item.GetComponent<Item_Transporter>().GetEndPosition());
+                }
+                else if (_name.Equals("RemoteKey"))
+                {
+                    item.GetComponent<Item_RemoteKey>().SetTargetDoor(_item.GetComponent<Item_RemoteKey>().GetTargetDoor());
+                    item.GetComponent<Item_RemoteKey>().SetTriggerPosition(_item.GetComponent<Item_RemoteKey>().GetTriggerPosition());
                 }
 
                 item_Group[j] = item;
-                ReflashItemAmount(j, 1);
+                ReflashItemAmount(j,1);
                 item_Id[j] = _id;
                 item_Name[j] = _name;
                 item_Description[j] = _description;
 
                 numberOfItem++;
+
+                //拾取成功 破坏源物品
+                _item.SendMessage("DestoryItem");
                 return true;
             }
         }
@@ -211,9 +194,18 @@ public class Player_BackPack : MonoBehaviour
                 item.transform.position = this.gameObject.transform.position;
 
                 // 特殊处理
-                if (item_Name[selectIndex[0]].Contains("Key"))
+                if (item_Name[selectIndex[0]].Equals("Key"))
                 {
                     item.GetComponent<Item_Key>().SetPairingValue(item_Group[selectIndex[0]].GetComponent<Item_Key>().GetPairingValue());
+                }
+                else if (item_Name[selectIndex[0]].Equals("Transporter"))
+                {
+                    item.GetComponent<Item_Transporter>().SetStartPosition(item_Group[selectIndex[0]].GetComponent<Item_Transporter>().GetStartPosition());
+                    item.GetComponent<Item_Transporter>().SetEndPosition(item_Group[selectIndex[0]].GetComponent<Item_Transporter>().GetEndPosition());
+                }
+                else if (item_Name[selectIndex[0]].Equals("RemoteKey")) {
+                    item.GetComponent<Item_RemoteKey>().SetTargetDoor(item_Group[selectIndex[0]].GetComponent<Item_RemoteKey>().GetTargetDoor());
+                    item.GetComponent<Item_RemoteKey>().SetTriggerPosition(item_Group[selectIndex[0]].GetComponent<Item_RemoteKey>().GetTriggerPosition());
                 }
 
                 ReflashItemAmount(selectIndex[0], 0);
@@ -224,20 +216,32 @@ public class Player_BackPack : MonoBehaviour
     // 丢弃物品(包含特殊处理) (移动端)
     public void DiscardItem(int _index)
     {
+        Debug.Log("test");
         if (inUsed || selectIndex.Count != 1) return;
-
+        
         if (inSelected && selectIndex.Count == 1)
         {
             GameObject item = LoadItemToScene(item_Id[selectIndex[0]]);
             // 需要把物体的加到Room里
             Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
+            
             item.transform.parent = room.transform;
             item.transform.position = this.gameObject.transform.position;
 
             // 特殊处理
-            if (item_Name[selectIndex[0]].Contains("Key"))
+            if (item_Name[selectIndex[0]].Equals("Key"))
             {
                 item.GetComponent<Item_Key>().SetPairingValue(item_Group[selectIndex[0]].GetComponent<Item_Key>().GetPairingValue());
+            }
+            else if (item_Name[selectIndex[0]].Equals("Transporter"))
+            {
+                item.GetComponent<Item_Transporter>().SetStartPosition(item_Group[selectIndex[0]].GetComponent<Item_Transporter>().GetStartPosition());
+                item.GetComponent<Item_Transporter>().SetEndPosition(item_Group[selectIndex[0]].GetComponent<Item_Transporter>().GetEndPosition());
+            }
+            else if (item_Name[selectIndex[0]].Equals("RemoteKey"))
+            {
+                item.GetComponent<Item_RemoteKey>().SetTargetDoor(item_Group[selectIndex[0]].GetComponent<Item_RemoteKey>().GetTargetDoor());
+                item.GetComponent<Item_RemoteKey>().SetTriggerPosition(item_Group[selectIndex[0]].GetComponent<Item_RemoteKey>().GetTriggerPosition());
             }
 
             ReflashItemAmount(selectIndex[0], 0);
@@ -256,6 +260,30 @@ public class Player_BackPack : MonoBehaviour
                 {
                     return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Key"));
                 }
+            case 3:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_RemoteKey"));
+                }
+            case 4:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Tranquilizer"));
+                }
+            case 5:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Transporter"));
+                }
+            case 6:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Candle"));
+                }
+            case 7:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Invisibility"));
+                }
+            case 8:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_SpecialFood"));
+                }
             default:
                 {
                     return null;
@@ -269,11 +297,35 @@ public class Player_BackPack : MonoBehaviour
         {
             case 0:
                 {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Food"));
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Food"));
                 }
             case 1:
                 {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/Key"));
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Key"));
+                }
+            case 3:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_RemoteKey"));
+                }
+            case 4:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Tranquilizer"));
+                }
+            case 5:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Transporter"));
+                }
+            case 6:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Candle"));
+                }
+            case 7:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Invivibility"));
+                }
+            case 8:
+                {
+                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_SpecialFood"));
                 }
             default:
                 {
@@ -351,6 +403,7 @@ public class Player_BackPack : MonoBehaviour
 
             if (item_StorageAmount[_index] <= 0) {
                 RemoveItem(_index);
+                GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(false);
             }
         }
 
@@ -416,7 +469,7 @@ public class Player_BackPack : MonoBehaviour
             backpack[i].GetComponent<Image>().color = Color.white;
         }
     }
-
+        
     // 合成物品
     public void ComposeItem() {
         if (selectIndex.Count < 2) return;

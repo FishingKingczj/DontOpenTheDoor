@@ -20,7 +20,7 @@ public class Item_Food : Item
 
         maxStorageAmount = 5;
 
-        progressRing = GameObject.Find("ProgressRing").GetComponent<Image>();
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     // 使用效果

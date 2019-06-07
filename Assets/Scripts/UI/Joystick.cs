@@ -14,6 +14,7 @@ public class Joystick : ScrollRect
     public Player player;
     private Vector2 forceVector;
     protected float radius;
+    [Range(0,1.0f)]
     protected float radius_Rush = 0.5f;
 
     public void FixedUpdate()
@@ -38,7 +39,6 @@ public class Joystick : ScrollRect
         // 可控制状态下玩家进行操作
         if (controllable)
         {
-            if(forceVector != Vector2.zero)
             player.PlayerMove(new Vector3(forceVector.x, forceVector.y, 0));
         }
         else {

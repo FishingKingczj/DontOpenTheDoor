@@ -24,9 +24,10 @@ public class Item : MonoBehaviour
         //拾取类物品
         if (pickable == true)
         {
-            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id ,name, description))
-                Destroy(this.gameObject);
-            else {
+            if (_user.GetComponent<Player_BackPack>().AddItem(this.gameObject, maxStorageAmount, id, name, description)) {
+            }
+            else
+            {
                 Debug.Log("背包已满");
             }
         }
@@ -54,8 +55,12 @@ public class Item : MonoBehaviour
         progressRing.fillAmount = (usageTime - timer_UsageTime) / usageTime;
     }
     public virtual void Use_Reset() {
-        timer_UsageTime = usageTime;
+        //忽略即时物品
+        if (progressRing == null) return;
 
+        timer_UsageTime = usageTime;
         progressRing.fillAmount = 0;
     }
+
+    public virtual void DestoryItem() { Destroy(this.gameObject); }
 }

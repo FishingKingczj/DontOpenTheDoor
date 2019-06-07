@@ -35,4 +35,9 @@ public class Buff_AuditoryHallucination : Buff
         audio.clip = Resources.Load<AudioClip>(path);
         audio.Play();
     }
+
+    private void OnDestroy()
+    {
+        Destroy(audio);
+    }
 }

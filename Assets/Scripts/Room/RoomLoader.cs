@@ -7,8 +7,8 @@ public class RoomLoader : MonoBehaviour
     static public int ROOM_SIZE = 24;
     private int UNIT_SIZE = 22;
 
-    private List<Room> allRooms;
-    private List<Room> activeRooms;
+    public List<Room> allRooms;
+    public List<Room> activeRooms;
 
     public Room playerRoom;
     public MainCamera mainCamera;
@@ -20,7 +20,7 @@ public class RoomLoader : MonoBehaviour
     }
 
     // 初始化房间
-    private void initRooms()
+    public void initRooms()
     {
         allRooms = new List<Room>();
         activeRooms = new List<Room>();
@@ -58,7 +58,7 @@ public class RoomLoader : MonoBehaviour
     }
 
     // 激活某个房间
-    private void ActiveRoom(Room center, Vector3 pos)
+    public void ActiveRoom(Room center, Vector3 pos)
     {
         Debug.Log("Active" + center.name);
         center.gameObject.SetActive(true);
@@ -152,6 +152,9 @@ public class RoomLoader : MonoBehaviour
     public Room GetPlayerRoom()
     {
         return playerRoom;
+    }
+    public void SetPlayerRoom(Room _room) {
+        playerRoom = _room;
     }
 
     // 计算两个房间之间的图距离，不连通则返回-1

@@ -21,7 +21,7 @@ public class Buff : MonoBehaviour
     // 移除效果
     public virtual void RemoveEffect() { }
 
-    // 定时器(移除BUFF 针对非永久性BUFF)
+    // 定时器(移除BUFF 针对非永久性增益BUFF)
     public virtual void Timer_RemoveBuff() {
         if (permanent == false) {
             if (duration <= 0)
@@ -35,7 +35,7 @@ public class Buff : MonoBehaviour
         }
     }
 
-    // 定时器(触发效果 针对永久性BUFF)
+    // 定时器(触发效果 针对永久性触发BUFF)
     public virtual void Timer_TriggerEffect() {
         if (timer_triggerTime <= 0)
         {
@@ -45,5 +45,9 @@ public class Buff : MonoBehaviour
         else {
             timer_triggerTime -= Time.deltaTime;
         }
+    }
+
+    public virtual void SetDuration(float _value) {
+        duration = _value;
     }
 }

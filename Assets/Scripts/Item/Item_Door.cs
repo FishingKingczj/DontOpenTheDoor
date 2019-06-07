@@ -70,12 +70,12 @@ public class Item_Door : Item
     }
 
     // 开关门
-    private void Open()
+    public void Open()
     {
         SetOpen(true);
     }
 
-    private void Close()
+    public void Close()
     {
 
         SetOpen(false);

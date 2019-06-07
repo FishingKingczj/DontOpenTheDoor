@@ -117,27 +117,27 @@ public class Player_BuffManager : MonoBehaviour
         {
             case 0:
                 {
-                    Destroy(this.gameObject.AddComponent<Buff_Phantom>());
+                    Destroy(this.gameObject.GetComponent<Buff_Phantom>());
                     break;
                 }
             case 1:
                 {
-                    Destroy(this.gameObject.AddComponent<Buff_AuditoryHallucination>());
+                    Destroy(this.gameObject.GetComponent<Buff_AuditoryHallucination>());
                     break;
                 }
             case 2:
                 {
-                    Destroy(this.gameObject.AddComponent<Buff_Madness>());
+                    Destroy(this.gameObject.GetComponent<Buff_Madness>());
                     break;
                 }
             case 3:
                 {
-                    Destroy(this.gameObject.AddComponent<Buff_Fatigue>());
+                    Destroy(this.gameObject.GetComponent<Buff_Fatigue>());
                     break;
                 }
             case 4:
                 {
-                    Destroy(this.gameObject.AddComponent<Buff_Frangibility>());
+                    Destroy(this.gameObject.GetComponent<Buff_Frangibility>());
                     break;
                 }
             case 5:
