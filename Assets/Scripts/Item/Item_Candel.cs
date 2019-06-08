@@ -17,7 +17,7 @@ public class Item_Candel : Item
 
     public override void Effect(GameObject _user)
     {
-        GameObject item = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Candle"));
+        GameObject item = ItemLoader.LoadItemToScene(id);
         Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
         item.transform.parent = room.transform;
         item.transform.position = _user.gameObject.transform.position;

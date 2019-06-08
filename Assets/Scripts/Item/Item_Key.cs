@@ -41,6 +41,7 @@ public class Item_Key : Item
 
                         _user.GetComponent<Player_BackPack>().UseSucceed(false);
                         t.GetComponent<Item_Door>().Unlock();
+                        t.GetComponent<Item_Door>().Open();
                     }
                     else
                     {

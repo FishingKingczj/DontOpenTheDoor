@@ -111,6 +111,8 @@ public class Player_BackPack : MonoBehaviour
             if (item_Name[i] == _name && item_StorageAmount[i] < _maxStorageAmount)
             {
                 ReflashItemAmount(i,1);
+                //拾取成功 破坏源物品
+                _item.SendMessage("DestoryItem");
                 return true;
             }
         }
@@ -119,7 +121,7 @@ public class Player_BackPack : MonoBehaviour
         for (int j = 0; j < maxStorageAmount; j++) {
             if (item_Group[j] == null)
             {
-                GameObject item = LoadItemToBackpack(_id);
+                GameObject item = ItemLoader.LoadItemToBackpack(_id);
                 if (item == null) return false;
 
                 // 物品信息更新
@@ -187,7 +189,7 @@ public class Player_BackPack : MonoBehaviour
         if (inSelected) {
             if (Input.GetKeyDown(KeyCode.G))
             {
-                GameObject item = LoadItemToScene(item_Id[selectIndex[0]]);
+                GameObject item = ItemLoader.LoadItemToScene(item_Id[selectIndex[0]]);
                 // 需要把物体的加到Room里
                 Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
                 item.transform.parent = room.transform;
@@ -216,12 +218,11 @@ public class Player_BackPack : MonoBehaviour
     // 丢弃物品(包含特殊处理) (移动端)
     public void DiscardItem(int _index)
     {
-        Debug.Log("test");
         if (inUsed || selectIndex.Count != 1) return;
         
         if (inSelected && selectIndex.Count == 1)
         {
-            GameObject item = LoadItemToScene(item_Id[selectIndex[0]]);
+            GameObject item = ItemLoader.LoadItemToScene(item_Id[selectIndex[0]]);
             // 需要把物体的加到Room里
             Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
             
@@ -245,92 +246,6 @@ public class Player_BackPack : MonoBehaviour
             }
 
             ReflashItemAmount(selectIndex[0], 0);
-        }
-    }
-
-    // 加载物品(生成到道具栏)
-    public GameObject LoadItemToBackpack(int _id) {
-        switch (_id)
-        {
-            case 0:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Food"));
-                }
-            case 1:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Key"));
-                }
-            case 3:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_RemoteKey"));
-                }
-            case 4:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Tranquilizer"));
-                }
-            case 5:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Transporter"));
-                }
-            case 6:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Candle"));
-                }
-            case 7:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_Invisibility"));
-                }
-            case 8:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Backpack_Item/Item_SpecialFood"));
-                }
-            default:
-                {
-                    return null;
-                }
-        }
-    }
-
-    // 加载物品(生成到场景)
-    public GameObject LoadItemToScene(int _id) {
-        switch (_id)
-        {
-            case 0:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Food"));
-                }
-            case 1:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Key"));
-                }
-            case 3:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_RemoteKey"));
-                }
-            case 4:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Tranquilizer"));
-                }
-            case 5:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Transporter"));
-                }
-            case 6:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Candle"));
-                }
-            case 7:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_Invivibility"));
-                }
-            case 8:
-                {
-                    return GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/Scene_Item/SceneItem_SpecialFood"));
-                }
-            default:
-                {
-                    return null;
-                }
         }
     }
 
@@ -608,7 +523,7 @@ public class Player_BackPack : MonoBehaviour
 
                 for (int i = 0; i < int.Parse(amount[2].Split('=')[1]); i++)
                 {
-                    GameObject item = LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
+                    GameObject item = ItemLoader.LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
                     Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
                     item.transform.parent = room.transform;
                     item.transform.position = this.gameObject.transform.position;
@@ -773,7 +688,7 @@ public class Player_BackPack : MonoBehaviour
 
                             for (int i = 0; i < int.Parse(amount[2].Split('=')[1]); i++)
                             {
-                                GameObject item = LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
+                                GameObject item = ItemLoader.LoadItemToScene(int.Parse(amount[2].Split('=')[0]));
                                 Room room = GameObject.Find("RoomLoader").GetComponent<RoomLoader>().GetPlayerRoom();
                                 item.transform.parent = room.transform;
                                 item.transform.position = this.gameObject.transform.position;
@@ -827,26 +742,6 @@ public class Player_BackPack : MonoBehaviour
     }
 
     public bool GetInCompositeMode() { return inCompositeMode; }
-
-    // 输出变量面板
-    public void Check() {
-        if (Time.timeScale == 0)
-        {
-            Time.timeScale = 1.0f;
-            GameObject.Find("Text_Debug").GetComponent<Text>().text = null;
-        }
-        else {
-            Time.timeScale = 0;
-
-            string a = null;
-            a += "In Selected : " + inSelected + '\n';
-            a += "In Used : " + inUsed + '\n';
-            a += "In Operated : " + inOperated + '\n';
-            a += "In CompositeMode : " + inCompositeMode + '\n';
-
-            GameObject.Find("Text_Debug").GetComponent<Text>().text = a;
-        }
-    }
 
     // 禁用背包
     public void DisableBackpack() {

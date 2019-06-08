@@ -63,4 +63,10 @@ public class Item : MonoBehaviour
     }
 
     public virtual void DestoryItem() { Destroy(this.gameObject); }
+
+    // item间的ID传输方法
+    public virtual void SendId(GameObject _user) {
+        _user.SendMessage("ReceiveId", id, SendMessageOptions.DontRequireReceiver);
+    }
+    public virtual void ReceiveId(int _id) { }
 }

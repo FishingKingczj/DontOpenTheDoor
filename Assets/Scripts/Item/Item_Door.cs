@@ -19,6 +19,11 @@ public class Item_Door : Item
 
     void Awake()
     {
+        id = 2;
+        name = "Door";
+
+        pickable = false;
+
         // TODO animate
         SpriteRenderer sr = gameObject.transform.GetComponent<SpriteRenderer>();
         if (inOpened)

@@ -35,6 +35,7 @@ public class Player : MoveObject
 
     private const float DEFAULT_SPEED = 1f;
     private const float RUSH_SPEED = DEFAULT_SPEED * 1.5f;
+    public float extra_Speed = 0.0f;
 
     [Header("EscapeMode varible")]
     public GameObject monster;
@@ -147,12 +148,12 @@ public class Player : MoveObject
         if (Input.GetKey(KeyCode.Space))
         {
             currentMovement = CurrentMovement.Rush;
-            setSpeed(RUSH_SPEED);
+            setSpeed(RUSH_SPEED + extra_Speed);
         }
         else
         {
             currentMovement = CurrentMovement.Run;
-            setSpeed(DEFAULT_SPEED);
+            setSpeed(DEFAULT_SPEED + extra_Speed);
         }
     }
 
@@ -162,12 +163,12 @@ public class Player : MoveObject
         if (inRushed)
         {
             currentMovement = CurrentMovement.Rush;
-            setSpeed(RUSH_SPEED);
+            setSpeed(RUSH_SPEED + extra_Speed);
         }
         else
         {
             currentMovement = CurrentMovement.Run;
-            setSpeed(DEFAULT_SPEED);
+            setSpeed(DEFAULT_SPEED + extra_Speed);
         }
     }
 
@@ -375,4 +376,8 @@ public class Player : MoveObject
     }
 
     public bool GetInEscape() { return inEscape; }
+
+    // 增加/减少 额外奔跑速度
+    public void AddExtraSpeed(float _value) { extra_Speed += _value; }
+    public void ReduceExtraSpeed(float _value) { extra_Speed -= _value; }
 }
