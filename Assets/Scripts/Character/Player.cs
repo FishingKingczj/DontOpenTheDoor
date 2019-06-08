@@ -7,9 +7,9 @@ using UnityEngine.SceneManagement;
 
 public class Player : MoveObject
 {
-	public int achievementID = 0;
-    
-	private const float DEFAULT_MAXENERGY = 100.0f;
+    public int achievementID = 0;
+
+    private const float DEFAULT_MAXENERGY = 100.0f;
 	[Header("Energy varible")]
 	public float energy_Current = DEFAULT_MAXENERGY;
 
@@ -120,6 +120,8 @@ public class Player : MoveObject
         {
             SetInMoved(true);
             currentMovement = CurrentMovement.Run;
+
+            Dialog.CloseDialog();
         }
         else {
             SetInMoved(false);
@@ -138,6 +140,7 @@ public class Player : MoveObject
             return;
         }
 
+        Dialog.CloseDialog();
         Vector3 vector = dir;
 
         Move(vector);
@@ -185,7 +188,6 @@ public class Player : MoveObject
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            
             Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
             if (colliders.Length > 0)
             {

@@ -95,15 +95,6 @@ public class Player_BackPack : MonoBehaviour
         #endif
     }
 
-    private void OnGUI()
-    {
-        // 测试用 显示选择的物品信息
-        if (inSelected && selectIndex.Count == 1)
-        {
-            GUI.TextField(new Rect(Screen.width / 2.0f - (Screen.height / 1.5f / 2.0f), Screen.height / 9.5f, Screen.height / 1.5f, Screen.height / 8), item_Name[selectIndex[0]] + '\n' + item_Description[selectIndex[0]]);
-        }
-    }
-
     // 添加道具 true->背包有余位 false->背包已满 (含特殊处理)
     public bool AddItem(GameObject _item, int _maxStorageAmount, int _id, string _name, string _description) {
         // 尝试寻找重复道具并叠加
@@ -352,16 +343,23 @@ public class Player_BackPack : MonoBehaviour
     {
         if (inUsed || inCompositeMode) return;
 
+        else {
+            Dialog.CloseDialog();
+        }
+
         if (item_Group[_index - 1] != null) {
             // 选择
             if (!selectIndex.Contains(_index - 1))
             {
+                // 选中提示
                 backpack[_index - 1].GetComponent<Image>().color = Color.red;
 
                 selectIndex.Add(_index - 1);
             }
             // 取消选择
             else { 
+
+                // 取消选中提示
                 backpack[_index - 1].GetComponent<Image>().color = Color.white;
 
                 selectIndex.Remove(_index - 1);
@@ -371,11 +369,16 @@ public class Player_BackPack : MonoBehaviour
         if (selectIndex.Count != 0) inSelected = true;
         else inSelected = false;
 
-        // 调用丢弃按钮
-        if (selectIndex.Count == 1) {
+        // 调用丢弃按钮与文本框
+        if (selectIndex.Count == 1)
+        {
             GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(true);
+            Dialog.ShowDialog(item_Description[selectIndex[0]]);
         }
-        else GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(false);
+        else {
+            GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(false);
+            Dialog.CloseDialog();
+        }
     }
 
     // 重设所有选中提示
