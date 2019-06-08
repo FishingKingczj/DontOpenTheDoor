@@ -17,6 +17,8 @@ public class Joystick : ScrollRect
     [Range(0,1.0f)]
     protected float radius_Rush = 0.5f;
 
+    public Image scrollCircle;
+
     public void FixedUpdate()
     {
         if (player.GetInEscape()) {
@@ -56,6 +58,8 @@ public class Joystick : ScrollRect
 
         controllable = true;
         CreateAutoMovementDir();
+
+        scrollCircle = content.gameObject.GetComponent<Image>();
     }   
 
     public override void OnDrag(PointerEventData eventData)
@@ -86,6 +90,8 @@ public class Joystick : ScrollRect
         }
 
         player.SetInMoved(true);
+
+        scrollCircle.sprite = Resources.Load<Sprite>("Image/UI/ScrollCircle_Seleted");
     }
 
     public override void OnEndDrag(PointerEventData eventData)
@@ -94,6 +100,8 @@ public class Joystick : ScrollRect
         forceVector = Vector2.zero;
 
         player.SetInMoved(false);
+
+        scrollCircle.sprite = Resources.Load<Sprite>("Image/UI/ScrollCircle");
     }
 
     public Vector2 GetVector() {

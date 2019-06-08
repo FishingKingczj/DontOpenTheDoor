@@ -119,6 +119,8 @@ public class Player : MoveObject
         {
             SetInMoved(true);
             currentMovement = CurrentMovement.Run;
+
+            Dialog.CloseDialog();
         }
         else {
             SetInMoved(false);
@@ -137,6 +139,7 @@ public class Player : MoveObject
             return;
         }
 
+        Dialog.CloseDialog();
         Vector3 vector = dir;
 
         Move(vector);
