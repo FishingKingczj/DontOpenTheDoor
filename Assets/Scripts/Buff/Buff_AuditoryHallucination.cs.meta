@@ -3,7 +3,9 @@ guid: 6bfb28fcba255e2419f35e9d88224aaa
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - buffImage: {fileID: 21300000, guid: 8ffda03acf9b6a347bc00b453393c4f5, type: 3}
+  - audio: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
