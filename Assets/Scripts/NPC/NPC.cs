@@ -15,6 +15,9 @@ public class NPC : MonoBehaviour
     public float npcTalkScale = 1.0f;
     public int achievementID = -1;
 
+    public string stateText;
+    public string transforText;
+
     private GameObject findRoom(string roomName) {
         return roomLoader.transform.FindChild(roomName).gameObject;
     }
@@ -24,14 +27,15 @@ public class NPC : MonoBehaviour
         achievementID = player.GetComponent<Player>().achievementID;
         //检测player和NPC的关系
         if (room.transform.name.Equals(roomLoader.GetComponent<RoomLoader>().playerRoom.name)) {
-            if (Vector2.Distance((Vector2)player.transform.position, (Vector2)transform.position) < npcTalkScale)
+            /*if (Vector2.Distance((Vector2)player.transform.position, (Vector2)transform.position) < npcTalkScale)
                 player_npcState = Player_NPCState.inTalkScale;
-            else
+            else*/
                 player_npcState = Player_NPCState.inRoom;
         }
         else
             player_npcState = Player_NPCState.outRoom;
         //检测NPC是否状态发生改变
+        if (!npcStateTransfor.ContainsKey(stateID)) return;
         StateTransfor stateTransfor = npcStateTransfor[stateID];
         if (stateTransfor.situation.Equals(player_npcState) && stateTransfor.parameter == achievementID) {
             stateID = stateTransfor.nextID;
@@ -45,18 +49,21 @@ public class NPC : MonoBehaviour
     //展示NPC对话和赠送礼物
     private void giveItem() {
         NpcState state = npcStates[stateID];
-        if (state.gift  == "nothing" || state.gift == "") return;
-
+        if (state.gift  == -1) return;
+        GameObject gift = ItemLoader.LoadItemToScene(state.gift);
+        gift.transform.SetParent(this.transform);
+        gift.transform.position = player.transform.position;
     }
     private void showDialog() {
         NpcState state = npcStates[stateID];
-        Debug.Log(state.dialog);
+        Dialog.ShowDialog(state.dialog);
     }
 
     public void interact() {
         showDialog();
         giveItem();
         player.GetComponent<Player>().achievementID = npcStates[stateID].achievementID;
+        achievementID = player.GetComponent<Player>().achievementID;
     }
     // Start is called before the first frame update
     void Start()
@@ -64,12 +71,26 @@ public class NPC : MonoBehaviour
         player = GameObject.Find("player");
         roomLoader = GameObject.Find("RoomLoader");
         
+        string[] lines = ReadInText.readin(stateText);
+        var count = 0;
+        int i = 0;
+        while (count < lines.Length) {
+            npcStates.Add(i, new NpcState(int.Parse(lines[count+0]), lines[count + 1], float.Parse(lines[count + 2]), float.Parse(lines[count + 3]), lines[count + 4], int.Parse(lines[count + 5]), int.Parse(lines[count + 6])));
+            count = count + 7;
+            i++;
+        }
 
-        npcStates.Add(0,new NpcState(0,"Room1",3,3,"hi","nothing",10));
-        npcStates.Add(1,new NpcState(1, "Room1", 3, 3, "hi222", "nothing", 20));
-        npcStates.Add(2,new NpcState(2, "Room2", 0, 0, "test", "nothing", 30));
-        npcStateTransfor.Add(0,new StateTransfor(0,1,Player_NPCState.inRoom,10));
-        npcStateTransfor.Add(1, new StateTransfor(1, 2, Player_NPCState.outRoom, 20));
+        lines = ReadInText.readin(transforText);
+        count = 0;
+        i = 0;
+        while (count < lines.Length)
+        {
+            npcStateTransfor.Add(i, new StateTransfor(int.Parse(lines[count + 0]), int.Parse(lines[count + 1]), lines[count + 2], int.Parse(lines[count + 3])));
+            count = count + 4;
+            i++;
+        }
+        //npcStateTransfor.Add(0,new StateTransfor(0,1,Player_NPCState.inRoom,10));
+        //npcStateTransfor.Add(1, new StateTransfor(1, 2, Player_NPCState.outRoom, 20));
 
         NpcState state = npcStates[stateID];
         room = findRoom(state.roomID);
@@ -92,9 +113,9 @@ public class NpcState {
     public float localX;
     public float localY;
     public string dialog;
-    public string gift="nothing";
+    public int gift= -1;
     public int achievementID;
-    public NpcState(int _ID, string _roomID, float _localX, float _localY,string _dialog,string _gift,int _achievement) {
+    public NpcState(int _ID, string _roomID, float _localX, float _localY,string _dialog,int _gift,int _achievement) {
         ID = _ID;
         roomID = _roomID;
         localX = _localX;
