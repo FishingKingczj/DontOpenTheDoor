@@ -9,12 +9,14 @@ public class Buff_AuditoryHallucination : Buff
     public AudioSource audio;
 
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
+        base.Start();
         id = 1;
         name = "AuditoryHallucination";
 
         permanent = true;
+        debuff = true;
 
         triggerTime = 45.0f;
         triggerTimeRandomRange = 15.0f;
@@ -22,6 +24,8 @@ public class Buff_AuditoryHallucination : Buff
 
         audio = this.gameObject.AddComponent<AudioSource>();
         audio.playOnAwake = false;
+
+        CreateBuffImage(id);
     }
 
     void Update()
@@ -36,8 +40,9 @@ public class Buff_AuditoryHallucination : Buff
         audio.Play();
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         Destroy(audio);
     }
 }

@@ -9,6 +9,7 @@ TagManager:
   - Room
   - Item_Collision
   - Player_Inivisble
+  - NPC
   layers:
   - Default
   - TransparentFX
@@ -54,4 +55,7 @@ TagManager:
     locked: 0
   - name: Monster
     uniqueID: 2181966693
+    locked: 0
+  - name: UI
+    uniqueID: 3489790489
     locked: 0
