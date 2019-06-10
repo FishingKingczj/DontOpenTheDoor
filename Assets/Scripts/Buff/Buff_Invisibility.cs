@@ -6,16 +6,19 @@ using UnityEngine.UI;
 public class Buff_Invisibility : Buff
 {
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
-        id = 6;
+        id = 5;
         name = "Invisibility";
 
         permanent = false;
+        debuff = false;
 
         duration = 60.0f;
 
         Effect();
+
+        CreateBuffImage(id);
     }
 
     // Update is called once per frame
@@ -32,7 +35,7 @@ public class Buff_Invisibility : Buff
         this.gameObject.GetComponent<SpriteRenderer>().color = c;
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         this.gameObject.tag = "Player";
         Color c = this.gameObject.GetComponent<SpriteRenderer>().color;

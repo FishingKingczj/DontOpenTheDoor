@@ -7,9 +7,8 @@ using UnityEngine.SceneManagement;
 
 public class Player : MoveObject
 {
-    public int achievementID = 0;
-
-    private const float DEFAULT_MAXENERGY = 100.0f;
+	
+	private const float DEFAULT_MAXENERGY = 100.0f;
 	[Header("Energy varible")]
 	public float energy_Current = DEFAULT_MAXENERGY;
 
@@ -191,13 +190,14 @@ public class Player : MoveObject
             Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
             if (colliders.Length > 0)
             {
-                //判断和NPC以及物品的交互
                 Collider2D item = null;
                 float dis = 0x9f9f9f9f;
 
                 for (int i = 0; i < colliders.Length; i++)
                 {
-                    if (colliders[i].tag.Contains("NPC") || colliders[i].tag.Contains("Item"))
+                    if (!colliders[i].tag.Contains("Item"))
+                        continue;
+                    else
                     {
                         if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
                         {
@@ -207,17 +207,8 @@ public class Player : MoveObject
                     }
                 }
 
-                if (!item) return;
-                if (item.tag.Contains("NPC"))
-                {
-                    item.transform.GetComponent<NPC>().interact();
-                }
-                else if (item.tag.Contains("Item"))
-                {
-
-                    item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
-                }
-
+                if (item == null) { return; }
+                else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver); 
             }
         }
     }
@@ -236,13 +227,14 @@ public class Player : MoveObject
         Collider2D[] colliders = Physics2D.OverlapCircleAll(this.transform.position, interaction_Range);
         if (colliders.Length > 0)
         {
-            //判断和NPC以及物品的交互
             Collider2D item = null;
             float dis = 0x9f9f9f9f;
 
             for (int i = 0; i < colliders.Length; i++)
             {
-                if (colliders[i].tag.Contains("NPC") || colliders[i].tag.Contains("Item"))
+                if (!colliders[i].tag.Contains("Item"))
+                    continue;
+                else
                 {
                     if (Vector2.Distance(this.gameObject.transform.position, colliders[i].transform.position) < dis)
                     {
@@ -251,16 +243,9 @@ public class Player : MoveObject
                     }
                 }
             }
-            if (!item) return;
 
-            if (item.tag.Contains("NPC"))
-            {
-                item.transform.GetComponent<NPC>().interact();
-            }
-            else if (item.tag.Contains("Item"))
-            {
-                item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
-            }
+            if (item == null) { return; }
+            else item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
         }
     }
 

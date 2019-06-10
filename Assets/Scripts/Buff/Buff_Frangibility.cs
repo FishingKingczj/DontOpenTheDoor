@@ -6,12 +6,18 @@ public class Buff_Frangibility : Buff
 {
     public float extraEscapePointCost = 2.0f;
     // Start is called before the first frame update
-    void Start()
+    public override void Start()
     {
+        base.Start();
+
         id = 4;
         name = "Frangibility";
 
+        debuff = true;
+
         Effect();
+
+        CreateBuffImage(id);
     }
 
     public override void Effect()
@@ -26,8 +32,9 @@ public class Buff_Frangibility : Buff
         this.GetComponent<Player>().ReduceExtraEscapePointCost(extraEscapePointCost);
     }
 
-    public void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         RemoveEffect();
     }
 }
