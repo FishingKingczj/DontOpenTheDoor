@@ -10,15 +10,12 @@ public class Buff_Madness : Buff
     public bool isTrigger;
 
     // Start is called before the first frame update
-    public override void Start()
+    void Start()
     {
-        base.Start();
-
         id = 2;
         name = "Madness";
 
         permanent = true;
-        debuff = true;
 
         triggerTime = 75.0f;
         triggerTimeRandomRange = 15.0f;
@@ -28,8 +25,6 @@ public class Buff_Madness : Buff
         timer_EffectDuration = effectDuration;
 
         isTrigger = false;
-
-        CreateBuffImage(id);
     }
 
     void Update()

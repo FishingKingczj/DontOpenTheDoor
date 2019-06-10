@@ -16,6 +16,9 @@ public class Item : MonoBehaviour
     public float usageTime;
     public float timer_UsageTime;
 
+    // 使用进度环(UI)
+    public Image progressRing;
+
     // 互动效果
     public virtual void Interact(GameObject _user){
         //拾取类物品
@@ -49,14 +52,14 @@ public class Item : MonoBehaviour
             timer_UsageTime -= Time.deltaTime;
         }
 
-        ProgressRing.Use((usageTime - timer_UsageTime) / usageTime);
+        progressRing.fillAmount = (usageTime - timer_UsageTime) / usageTime;
     }
     public virtual void Use_Reset() {
         //忽略即时物品
-        if (usageTime == 0) return;
+        if (progressRing == null) return;
 
         timer_UsageTime = usageTime;
-        ProgressRing.Reset();
+        progressRing.fillAmount = 0;
     }
 
     public virtual void DestoryItem() { Destroy(this.gameObject); }

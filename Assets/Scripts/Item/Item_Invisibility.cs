@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Item_Invisibility : Item
 {
@@ -21,6 +22,8 @@ public class Item_Invisibility : Item
         timer_UsageTime = usageTime;
 
         duration = 60.0f;
+
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     public override void Effect(GameObject _user)

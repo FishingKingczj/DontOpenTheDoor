@@ -20,6 +20,8 @@ public class Item_SpecialFood : Item
         timer_UsageTime = usageTime;
 
         maxStorageAmount = 5;
+
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     // 使用效果

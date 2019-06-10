@@ -217,6 +217,7 @@ public class Player : MoveObject
 
                     item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
                 }
+
             }
         }
     }

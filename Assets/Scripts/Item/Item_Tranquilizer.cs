@@ -18,6 +18,8 @@ public class Item_Tranquilizer : Item
         timer_UsageTime = usageTime;
 
         maxStorageAmount = 5;
+
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     public override void Effect(GameObject _user)

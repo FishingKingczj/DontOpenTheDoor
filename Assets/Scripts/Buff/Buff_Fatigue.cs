@@ -7,19 +7,14 @@ public class Buff_Fatigue : Buff
     public float extraEnerguConsumption = 2.0f;
 
     // Start is called before the first frame update
-    public override void Start()
+    void Start()
     {
-        base.Start();
-
         id = 3;
         name = "Fatigue";
 
         permanent = true;
-        debuff = true;
 
         Effect();
-
-        CreateBuffImage(id);
     }
 
     public override void Effect()
@@ -36,9 +31,8 @@ public class Buff_Fatigue : Buff
         this.GetComponent<Player>().ReduceEnergyExtraConsumption(extraEnerguConsumption);
     }
 
-    public override void OnDestroy()
+    public void OnDestroy()
     {
-        base.OnDestroy();
         RemoveEffect();
     }
 }

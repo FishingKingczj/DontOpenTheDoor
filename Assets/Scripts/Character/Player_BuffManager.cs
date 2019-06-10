@@ -7,9 +7,6 @@ public class Player_BuffManager : MonoBehaviour
 {
     [Header("Basic variable")]
     public float pressurePoint = 0;
-    public float pressurePointLine = 0;
-    private const float CHANGESPEED = 40.0f;
-    private const float MAXPRESSUREPOINT = 200.0f;
 
     public List<PressureThreshold> pressureThreshold;
     public int pressureLevel = 0;
@@ -22,33 +19,49 @@ public class Player_BuffManager : MonoBehaviour
 
     public List<int> currentBuffId;
 
-    public Slider slider;
-
-    private void Start()
+    // Start is called before the first frame update
+    void Start()
     {
-        slider = GameObject.Find("Canvas_UI").transform.Find("Slider_PressurePoint").GetComponent<Slider>();
+        
     }
 
+    // Update is called once per frame
     void Update()
     {
-        CheckPressPoint();
+
     }
 
     // 增加/减少 压力值(同时检测压力等级)
     public void AddPressurePoint(float _value) {
-        pressurePointLine += _value;
+        pressurePoint += _value;
+
+        // 临时使用
+        GameObject.Find("Text_PressurePoint").GetComponent<Text>().text = "PreesurePoint : " + pressurePoint + "\nPressureLevel : " + pressureLevel;
+
+        if (pressureLevel != pressureThreshold.Count && pressurePoint >= pressureThreshold[pressureLevel].threshold)
+        {
+            pressureLevel++;
+            AddBuff();
+        }
     }
     public void ReducePressPoint(float _value) {
-        pressurePointLine -= _value;
+        pressurePoint -= _value;
+
+        // 临时使用
+        GameObject.Find("Text_PressurePoint").GetComponent<Text>().text = "PreesurePoint : " + pressurePoint + "\nPressureLevel : " + pressureLevel;
+
+        if (pressureLevel > 0 && pressurePoint < pressureThreshold[pressureLevel - 1].threshold)
+        {
+            pressureLevel--;
+        }
     }
 
-    // 添加Buff(随机池)
+    // 添加Buff
     public void AddBuff() {
         if (pressureLevel < 1) return;
 
         int size = pressureThreshold[pressureLevel - 1].buffID.Count;
 
-        Debug.Log("test");
         for (int i = 0; i < 20; i++) {
             int newBuffId = pressureThreshold[pressureLevel - 1].buffID[Random.Range(0, size)];
 
@@ -78,9 +91,14 @@ public class Player_BuffManager : MonoBehaviour
                             this.gameObject.AddComponent<Buff_Frangibility>();
                             break;
                         }
-                    default: break;
+                    case 5:
+                        {
+                            break;
+                        }
+                    default:break;
                 }
                 currentBuffId.Add(newBuffId);
+
                 return;
             }
         }
@@ -88,7 +106,7 @@ public class Player_BuffManager : MonoBehaviour
         Debug.Log("效果重叠");
     }
 
-    // 删除Buff(随机池)
+    // 删除Buff
     public void DeleteBuff() {
         if (currentBuffId.Count == 0) return;
 
@@ -122,36 +140,14 @@ public class Player_BuffManager : MonoBehaviour
                     Destroy(this.gameObject.GetComponent<Buff_Frangibility>());
                     break;
                 }
+            case 5:
+                {
+                    break;
+                }
             default: break;
 
         }
+
         currentBuffId.Remove(deleteIndex);
-    }
-
-    private void CheckPressPoint() {
-        pressurePointLine = Mathf.Clamp(pressurePointLine, 0, 200.0f);
-
-        if (pressurePointLine > pressurePoint)
-        {
-            pressurePoint += CHANGESPEED * Time.deltaTime;
-            pressurePoint = Mathf.Clamp(pressurePoint, pressurePoint, pressurePointLine);
-        }
-        else if (pressurePointLine < pressurePoint) {
-            pressurePoint -= CHANGESPEED * Time.deltaTime;
-            pressurePoint = Mathf.Clamp(pressurePoint, pressurePointLine, pressurePoint);
-        }
-
-        slider.value = pressurePoint;
-
-        // 检测压力等级
-        if (pressureLevel != pressureThreshold.Count && pressurePoint >= pressureThreshold[pressureLevel].threshold)
-        {
-            pressureLevel++;
-            AddBuff();
-        }
-        if (pressureLevel > 0 && pressurePoint < pressureThreshold[pressureLevel - 1].threshold)
-        {
-            pressureLevel--;
-        }
     }
 }

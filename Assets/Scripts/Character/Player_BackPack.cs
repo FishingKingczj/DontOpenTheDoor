@@ -27,6 +27,7 @@ public class Player_BackPack : MonoBehaviour
     public bool inUsed = false;
 
     public bool inOperated = false;
+    public float operateDelayTime = 0.5f;
 
     public Vector2 interact_Pivot;
     public float interact_Radius;
@@ -37,6 +38,8 @@ public class Player_BackPack : MonoBehaviour
 
     public const float COMPOSEITEMUSAGETIME = 1.0f;
     public float timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
+
+    public Image progressRing;
 
     void Start()
     {
@@ -67,13 +70,14 @@ public class Player_BackPack : MonoBehaviour
         foreach (GameObject t in backpack) {
             text_StorageAmount[j++] = t.GetComponentInChildren<Text>();
         }
+
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").gameObject.GetComponent<Image>();
     }
 
     void FixedUpdate()
     {
 
-        UseItem(); // Temp
-        ComposeItem(); // Temp
+        UseItem();
 
         #if UNITY_ANDROID
             UseItem(1); // 移动端(带任意整形参数) 电脑端(无参)
@@ -304,7 +308,6 @@ public class Player_BackPack : MonoBehaviour
             }
 
             if (item_StorageAmount[_index] <= 0) {
-                Dialog.CloseDialog();
                 RemoveItem(_index);
                 GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(false);
             }
@@ -375,15 +378,6 @@ public class Player_BackPack : MonoBehaviour
         else {
             GameObject.Find("Canvas_UI").transform.Find("Button_Discard").gameObject.SetActive(false);
             Dialog.CloseDialog();
-        }
-
-        // 根据选择数切换按钮
-        if (selectIndex.Count >= 2)
-        {
-            GameObject.Find("Canvas_UI").transform.Find("Button_Compose").gameObject.SetActive(true);
-        }
-        else {
-            GameObject.Find("Canvas_UI").transform.Find("Button_Compose").gameObject.SetActive(false);
         }
     }
 
@@ -544,9 +538,9 @@ public class Player_BackPack : MonoBehaviour
             }
             else {
                 // 延迟进度环
-                if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME))
+                if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME - operateDelayTime))
                 {
-                    ProgressRing.Use(((COMPOSEITEMUSAGETIME) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME));
+                    progressRing.fillAmount = ((COMPOSEITEMUSAGETIME - operateDelayTime) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME - operateDelayTime);
                 }
                 timer_ComposeItemUsageTime -= Time.deltaTime;
                 inCompositeMode = true;
@@ -710,9 +704,9 @@ public class Player_BackPack : MonoBehaviour
                         else
                         {
                             // 延迟进度环
-                            if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME))
+                            if (timer_ComposeItemUsageTime <= (COMPOSEITEMUSAGETIME - operateDelayTime))
                             {
-                                ProgressRing.Use(((COMPOSEITEMUSAGETIME) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME));
+                                progressRing.fillAmount = ((COMPOSEITEMUSAGETIME - operateDelayTime) - timer_ComposeItemUsageTime) / (COMPOSEITEMUSAGETIME - operateDelayTime);
                             }
                             inCompositeMode = true;
                             timer_ComposeItemUsageTime -= Time.deltaTime;
@@ -733,14 +727,11 @@ public class Player_BackPack : MonoBehaviour
         CancelOperation();
 
         inCompositeMode = false;
-
-        GameObject.Find("Canvas_UI").transform.Find("Button_Interact").gameObject.SetActive(true);
-        GameObject.Find("Canvas_UI").transform.Find("Button_Compose").gameObject.SetActive(false);
     }
 
     // 重设定时器(取消操作)
     public void CancelOperation() {
-        ProgressRing.Reset();
+        progressRing.fillAmount = 0;
         timer_ComposeItemUsageTime = COMPOSEITEMUSAGETIME;
 
         inOperated = false;
@@ -750,10 +741,7 @@ public class Player_BackPack : MonoBehaviour
             item_Group[selectIndex[0]].SendMessage("Use_Reset", this.gameObject, SendMessageOptions.DontRequireReceiver);
         }
 
-        if (inCompositeMode)
-        {
-            inCompositeMode = false;
-        }
+        inCompositeMode = false;
     }
 
     public bool GetInCompositeMode() { return inCompositeMode; }

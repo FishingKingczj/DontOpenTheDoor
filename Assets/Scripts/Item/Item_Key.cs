@@ -22,6 +22,8 @@ public class Item_Key : Item
 
         usageTime = 2.0f;
         timer_UsageTime = usageTime;
+
+        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     public override void Effect(GameObject _user)
@@ -84,7 +86,7 @@ public class Item_Key : Item
                         timer_UsageTime -= Time.deltaTime;
                     }
 
-                    ProgressRing.Use((usageTime - timer_UsageTime) / usageTime);
+                    progressRing.fillAmount = (usageTime - timer_UsageTime) / usageTime;
                     return;
                 }
             }
