@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class Player : MoveObject
 {
     public int achievementID = 0;
+    public Animator anim;
 
     private const float DEFAULT_MAXENERGY = 100.0f;
 	[Header("Energy varible")]
@@ -59,6 +60,7 @@ public class Player : MoveObject
     public float pressurePointIncrementWhenStartQTE = 10.0f;
 
 	void Start(){
+
         //CircleCollider2D box = gameObject.AddComponent<CircleCollider2D>();
         //box.radius = interaction_Range;
         //box.isTrigger = true;
@@ -118,16 +120,18 @@ public class Player : MoveObject
 
         if (vector != Vector3.zero)
         {
+
             SetInMoved(true);
             currentMovement = CurrentMovement.Run;
 
             Dialog.CloseDialog();
         }
         else {
+            anim.SetInteger("state", 0);
             SetInMoved(false);
             currentMovement = CurrentMovement.Idle;
         }
-
+        
         Move(vector);
     }
 
@@ -136,6 +140,7 @@ public class Player : MoveObject
     {
         if (energy_Current <= 0 || this.GetComponent<Player_BackPack>().GetInCompositeMode()) return;
         if (dir == Vector3.zero) {
+            anim.SetInteger("state", 0);
             currentMovement = CurrentMovement.Idle;
             return;
         }
@@ -143,19 +148,23 @@ public class Player : MoveObject
         Dialog.CloseDialog();
         Vector3 vector = dir;
 
+        
         Move(vector);
     }
 
     // 控制人物冲刺
     private void PlayerRush()
     {
+        
         if (Input.GetKey(KeyCode.Space))
         {
+            anim.SetInteger("state", 1);
             currentMovement = CurrentMovement.Rush;
             setSpeed(RUSH_SPEED + extra_Speed);
         }
         else
         {
+            anim.SetInteger("state", 2);
             currentMovement = CurrentMovement.Run;
             setSpeed(DEFAULT_SPEED + extra_Speed);
         }
@@ -166,11 +175,13 @@ public class Player : MoveObject
     {
         if (inRushed)
         {
+            anim.SetInteger("state", 1);
             currentMovement = CurrentMovement.Rush;
             setSpeed(RUSH_SPEED + extra_Speed);
         }
         else
         {
+            anim.SetInteger("state", 2);
             currentMovement = CurrentMovement.Run;
             setSpeed(DEFAULT_SPEED + extra_Speed);
         }

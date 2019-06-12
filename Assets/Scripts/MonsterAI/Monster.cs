@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class Monster : MonoBehaviour
 {
+    public Animator anim;
+
     [Header("player PressureSystem variable")]
     public bool visiable = false;
     public float timer_Standard = 1.0f;
@@ -91,33 +93,45 @@ public class Monster : MonoBehaviour
     {
         if (state.intentionType.Equals(MonsterState.walk))
         {
+            anim.SetInteger("state", 0);
             autoMove((Vector2)aimObject.transform.position, monster_walkSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.rush))
         {
+            anim.SetInteger("state", 1);
             straightMove(aimPoint, monster_rushSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.attack))
         {
-            //Debug.Log("Monster is attacking!!!!");
-            //SceneManager.LoadScene(0);
+
+            // 触发逃脱模式
+            anim.SetInteger("state",2);
+            attack();
+            
         }
         else if (state.intentionType.Equals(MonsterState.goBack))
         {
+            anim.SetInteger("state", 0);
             if (Vector2.Distance(aimPoint, (Vector2)transform.position) < 0.5f) timer = -1.0f;
             straightMove(aimPoint, monster_goBackSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.hangOut))
         {
+            anim.SetInteger("state", 0);
             straightMove(aimPoint, monster_hangOutSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.stay))
         {
-
+            anim.SetInteger("state", 0);
         }
         else {
             //Debug.Log("error action");
         }
+    }
+
+    private void attack() {
+        Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
+        this.GetComponent<Monster_Battle>().StartAttack(GameObject.Find("player").gameObject);
     }
 
     private void faceTo(Vector2 targetPoint) {
@@ -183,9 +197,7 @@ public class Monster : MonoBehaviour
                     state.issueType = MonsterState.canAttack;
             }
 
-            // 触发逃脱模式
-            Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
-            this.GetComponent<Monster_Battle>().StartAttack(feeledObject);
+            
         }
         //Debug.Log(state.issueType);
     }
