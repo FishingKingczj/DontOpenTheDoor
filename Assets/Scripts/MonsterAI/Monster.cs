@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class Monster : MonoBehaviour
 {
+    public Animator anim;
+
     [Header("player PressureSystem variable")]
     public bool visiable = false;
     public float timer_Standard = 1.0f;
@@ -27,7 +29,8 @@ public class Monster : MonoBehaviour
     /************************/
 
     private State state = new State();
-    private MonsterAI monsterAI = new MonsterAI();
+    public string AIPath = "Text/BaseAI";
+    private MonsterAI monsterAI;
     //private MonsterParameter monsterParameter;
 
     private float timer = 0;
@@ -90,33 +93,45 @@ public class Monster : MonoBehaviour
     {
         if (state.intentionType.Equals(MonsterState.walk))
         {
+            anim.SetInteger("state", 0);
             autoMove((Vector2)aimObject.transform.position, monster_walkSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.rush))
         {
+            anim.SetInteger("state", 1);
             straightMove(aimPoint, monster_rushSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.attack))
         {
-            //Debug.Log("Monster is attacking!!!!");
-            //SceneManager.LoadScene(0);
+
+            // 触发逃脱模式
+            anim.SetInteger("state",2);
+            attack();
+            
         }
         else if (state.intentionType.Equals(MonsterState.goBack))
         {
+            anim.SetInteger("state", 0);
             if (Vector2.Distance(aimPoint, (Vector2)transform.position) < 0.5f) timer = -1.0f;
             straightMove(aimPoint, monster_goBackSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.hangOut))
         {
+            anim.SetInteger("state", 0);
             straightMove(aimPoint, monster_hangOutSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.stay))
         {
-
+            anim.SetInteger("state", 0);
         }
         else {
-            Debug.Log("error action");
+            //Debug.Log("error action");
         }
+    }
+
+    private void attack() {
+        Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
+        this.GetComponent<Monster_Battle>().StartAttack(GameObject.Find("player").gameObject);
     }
 
     private void faceTo(Vector2 targetPoint) {
@@ -152,6 +167,7 @@ public class Monster : MonoBehaviour
     void Start()
     {
         brithposiotion = transform.position;
+        monsterAI = new MonsterAI(AIPath);
 
     }
 
@@ -181,9 +197,7 @@ public class Monster : MonoBehaviour
                     state.issueType = MonsterState.canAttack;
             }
 
-            // 触发逃脱模式
-            Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
-            this.GetComponent<Monster_Battle>().StartAttack(feeledObject);
+            
         }
         //Debug.Log(state.issueType);
     }
@@ -293,54 +307,24 @@ public class State
 
 public class MonsterAI
 {
-    private Dictionary<string, string> ai = new Dictionary<string, string>();
-    public MonsterAI()
+    public Dictionary<string, string> ai = new Dictionary<string, string>();
+    public MonsterAI() {
+        
+    }
+    public MonsterAI(string AIPath)
     {
-        //读入配置表
-        ai.Add("stay_seeNothing", "hangOut");
-        ai.Add("stay_seeDoor", "hangOut");
-        ai.Add("stay_seeCollision", "hangOut");
-        ai.Add("stay_seePlayer","walk");
-        ai.Add("stay_canAttack", "attack");
+        string[] lines = ReadInText.readin(AIPath);
+        int count = 0;
+        while (count < lines.Length)
+        {
+            ai.Add(lines[count + 0], lines[count + 1]);
+            count = count + 2;
+        }
 
-        ai.Add("walk_seeNothing", "hangOut");
-        ai.Add("walk_seeDoor", "hangOut");
-        ai.Add("walk_seeCollision", "walk");
-        ai.Add("walk_seePlayer", "rush");
-        ai.Add("walk_canAttack", "attack");
-
-        ai.Add("rush_seeNothing", "hangOut");
-        ai.Add("rush_seeDoor", "hangOut");
-        ai.Add("rush_seeCollision", "walk");
-        ai.Add("rush_seePlayer", "walk");
-        ai.Add("rush_canAttack", "attack");
-
-        ai.Add("attack_seeNothing", "hangOut");
-        ai.Add("attack_seeDoor", "hangOut");
-        ai.Add("attack_seeCollision", "walk");
-        ai.Add("attack_seePlayer", "walk");
-        ai.Add("attack_canAttack", "attack");
-
-        ai.Add("hangOut_seeNothing", "goBack");
-        ai.Add("hangOut_seeDoor", "goBack");
-        ai.Add("hangOut_seeCollision", "walk");
-        ai.Add("hangOut_seePlayer", "rush");
-        ai.Add("hangOut_canAttack", "attack");
-
-        ai.Add("goBack_seeNothing", "hangOut");
-        ai.Add("goBack_seeDoor", "hangOut");
-        ai.Add("goBack_seeCollision", "walk");
-        ai.Add("goBack_seePlayer", "walk");
-        ai.Add("goBack_canAttack", "attack");
-
-        ai.Add("error_seeNothing", "error");
-        ai.Add("error_seeDoor", "error");
-        ai.Add("error_seeCollision", "error");
-        ai.Add("error_seePlayer", "error");
-        ai.Add("error_canAttack", "error");
     }
     public string getIntentionType(string state_issue)
     {
+
         if (ai.ContainsKey(state_issue))
         {
             return ai[state_issue];

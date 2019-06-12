@@ -20,7 +20,24 @@ public abstract class MoveObject : MonoBehaviour
     // 角色转向，tx/ty的正负表示朝向
     protected void Turn(float tx, float ty)
     {
-        if (Math.Abs(tx) > Math.Abs(ty))
+        /*Transform childtransform = transform;
+        foreach (Transform child in transform) {
+            if (child.name.Equals("Point Light")) {
+                childtransform = child;
+            }
+        }*/
+        if (tx > 0) {
+            transform.localScale = new Vector3(1f, 1f, 1f);
+            //childtransform.rotation = Quaternion.Euler(0, 0, 0);
+        }
+        
+        else if (tx < 0)
+        {
+            transform.localScale = new Vector3(-1f, 1f, 1f);
+            //childtransform.rotation = Quaternion.Euler(0, 180, 0);
+        }
+            
+        /*if (Math.Abs(tx) > Math.Abs(ty))
         {
             if (tx > 0)
                 transform.rotation = Quaternion.Euler(0, 0, 270);
@@ -33,7 +50,7 @@ public abstract class MoveObject : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0, 0, 0);
             else if (ty < 0)
                 transform.rotation = Quaternion.Euler(0, 0, 180);
-        }
+        }*/
     }
 
     // 设置角色的速度
