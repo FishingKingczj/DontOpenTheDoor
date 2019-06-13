@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class PlayerEvent : MonoBehaviour
 {
@@ -16,8 +15,8 @@ public class PlayerEvent : MonoBehaviour
     }
 
     public static void die() {
-        Debug.Log("die");
-        SceneManager.LoadScene(0);
+
+        
     }
     // Start is called before the first frame update
     void Start()
