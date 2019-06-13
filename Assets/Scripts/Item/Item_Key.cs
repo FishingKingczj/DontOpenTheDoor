@@ -22,6 +22,8 @@ public class Item_Key : Item
 
         usageTime = 2.0f;
         timer_UsageTime = usageTime;
+
+        pairingValue = 1;
     }
 
     public override void Effect(GameObject _user)

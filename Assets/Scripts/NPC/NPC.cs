@@ -86,10 +86,6 @@ public class NPC : MonoBehaviour
         i = 0;
         while (count < lines.Length-1)
         {
-            Debug.Log(lines[count + 0]);
-            Debug.Log(lines[count + 1]);
-            Debug.Log(lines[count + 2]);
-            Debug.Log(lines[count + 3]);
             npcStateTransfor.Add(i, new StateTransfor(int.Parse(lines[count + 0]), int.Parse(lines[count + 1]), lines[count + 2], int.Parse(lines[count + 3])));
             count = count + 4;
             i++;

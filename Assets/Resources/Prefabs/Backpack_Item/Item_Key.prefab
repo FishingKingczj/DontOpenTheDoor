@@ -94,4 +94,4 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  pairingValue: 0
+  pairingValue: 1

@@ -51,7 +51,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a55bb72fef7e8eb4e87966c8ebf8b8a1, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -132,7 +132,7 @@ MonoBehaviour:
   initiallyVolume: 0.5
   itemProbability: 50
   itemPosition: {fileID: 8736922612296206723}
-  itemPool: 
+  itemPool: 0000000008000000
   audio: {fileID: 0}
   sound: {fileID: 0}
 --- !u!1 &8736922612296206723

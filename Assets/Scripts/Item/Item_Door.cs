@@ -63,6 +63,7 @@ public class Item_Door : Item
     {
         if (!enabled)
         {
+            Dialog.ShowDialog("This is locked. You need a key");
             return;
         }
         Transform renderer = gameObject.transform.Find("Renderer");

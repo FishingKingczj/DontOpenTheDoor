@@ -17,7 +17,7 @@ public class Item_SecretLock : Item
 
         pickable = false;
 
-        manager = this.transform.parent.GetComponent<Item_SecretLockManager>();
+        //manager = GameObject.Find("SceneItem_SecretLock").GetComponent<Item_SecretLockManager>();
 
         if (key == -1) { Debug.LogWarning(this.gameObject.name + " 并未赋予Key值"); }
     }
@@ -27,7 +27,7 @@ public class Item_SecretLock : Item
         if (inTrigger)
         {
             inTrigger = false;
-            this.gameObject.transform.position = this.gameObject.transform.position + new Vector3(0, 0.1f, 0);
+            this.gameObject.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 0f));
         }
     }
 
@@ -37,7 +37,7 @@ public class Item_SecretLock : Item
             if (manager.Pair(key, _user))
             {
                 inTrigger = true;
-                this.gameObject.transform.position = this.gameObject.transform.position + new Vector3(0, -0.1f, 0);
+                this.gameObject.transform.rotation = Quaternion.Euler(new Vector3(0f, 0f, 180f));
             }
         }
     }

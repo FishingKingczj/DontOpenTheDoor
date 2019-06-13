@@ -11,7 +11,7 @@ public class Item_Food : Item
     {
         id = 0;
         name = "Food";
-        description = "这是一袋大米,恢复10点体力";
+        description = "This is food to restore 10 Restore physical strength";
 
         pickable = true;
 

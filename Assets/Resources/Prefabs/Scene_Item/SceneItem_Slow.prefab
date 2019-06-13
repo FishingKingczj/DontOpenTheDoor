@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3842903478267290893}
   - component: {fileID: 3842903478267290890}
   - component: {fileID: 3842903478267290892}
-  - component: {fileID: 3842903478267290891}
+  - component: {fileID: 1904104729}
   m_Layer: 0
   m_Name: SceneItem_Slow
   m_TagString: Untagged
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 3842903478267290888}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.2, y: 0, z: 0}
-  m_LocalScale: {x: 0.300284, y: 0.300284, z: 0.300284}
+  m_LocalScale: {x: 1, y: 1, z: 0.300284}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -50,7 +50,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a55bb72fef7e8eb4e87966c8ebf8b8a1, type: 2}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -68,10 +68,10 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1895219191
-  m_SortingLayer: 1
+  m_SortingLayerID: -1504596019
+  m_SortingLayer: -1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 5141573b631a65a4daa23591a91c38bd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: fce22d7be70b34f4e95a2c4fbd64db8b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -80,7 +80,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &3842903478267290892
 MonoBehaviour:
@@ -101,10 +101,9 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  progressRing: {fileID: 0}
-  decelerationValue: 0.9
---- !u!61 &3842903478267290891
-BoxCollider2D:
+  decelerationValue: 0.5
+--- !u!68 &1904104729
+EdgeCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -117,15 +116,16 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 10.5, y: 8.4}
-    newSize: {x: 10.5, y: 8.4}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  serializedVersion: 2
-  m_Size: {x: 10.5, y: 8.4}
   m_EdgeRadius: 0
+  m_Points:
+  - {x: -3.01, y: 0}
+  - {x: -2.6016169, y: -0.43195534}
+  - {x: 1.8616781, y: -0.29561043}
+  - {x: 2.077056, y: 0.050863266}
+  - {x: 0.48222256, y: 0.27764702}
+  - {x: 1.091857, y: 0.75375557}
+  - {x: -0.3928156, y: 1.4876499}
+  - {x: -1.9875402, y: 1.2718487}
+  - {x: -2.0835485, y: 1.0108242}
+  - {x: -1.357173, y: 0.55444527}
+  - {x: -3.0627947, y: 0.025411606}

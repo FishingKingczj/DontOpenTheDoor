@@ -12,7 +12,7 @@ public class Item_SpecialFood : Item
     {
         id = 8;
         name = "SpecialFood";
-        description = "这是一个特殊方便面,恢复大量体力但是有压力";
+        description = "Able to recover a lot of physical strength if you don't care about its materials";
 
         pickable = true;
 

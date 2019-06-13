@@ -44,14 +44,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Default
-    uniqueID: 0
-    locked: 0
   - name: AAfterPlayer
     uniqueID: 1945727791
     locked: 0
   - name: AfterPlayer
     uniqueID: 2790371277
+    locked: 0
+  - name: Default
+    uniqueID: 0
     locked: 0
   - name: Item
     uniqueID: 2399748105

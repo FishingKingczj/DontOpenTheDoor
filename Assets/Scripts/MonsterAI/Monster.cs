@@ -12,7 +12,7 @@ public class Monster : MonoBehaviour
     public bool visiable = false;
     public float timer_Standard = 1.0f;
     public float pressurePointIncrement = 1.0f;
-    public bool isBattle = false;
+    public string isBattle = "notBattle";
 
     //monster parameter
     public float monster_attackTime = 1.0f;
@@ -149,7 +149,7 @@ public class Monster : MonoBehaviour
 
     private void attack() {
         Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
-        isBattle = true;
+        isBattle = "battle";
         this.GetComponent<Monster_Battle>().StartAttack(GameObject.Find("player").gameObject);
     }
 
@@ -198,7 +198,8 @@ public class Monster : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        birthposiotion = transform.position;
+        birthposiotion = transform.localPosition + transform.parent.position;
+
         monsterAI = new MonsterAI(AIPath);
 
     }
@@ -206,12 +207,22 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isBattle) return;
-        Debug.Log(transform.parent.position);
-        Debug.Log(transform.position);
-        Debug.Log(transform.localPosition);
-        birthposiotion = transform.parent.position+transform.localPosition;
-        Debug.Log(birthposiotion);
+        birthposiotion = transform.localPosition + transform.parent.position;
+
+        Debug.Log(isBattle);
+
+        if (isBattle == "battle") {
+            timer = 0.5f;
+            return;
+        }
+
+        if (isBattle == "afterBattle") {
+            if (timer < 0) isBattle = "notBattle";
+            timer -= Time.deltaTime;
+            return;
+        }
+
+        
 
         if (visiable) Timer_AddPressurePoint();
 

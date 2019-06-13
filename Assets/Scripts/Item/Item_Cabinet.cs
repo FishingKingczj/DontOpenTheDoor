@@ -27,7 +27,7 @@ public class Item_Cabinet : Item
         pickable = false;
 
         audio = this.gameObject.AddComponent<AudioSource>();
-        sound = Resources.Load<AudioClip>("Audio/Item/Cabinet/Audio_1");
+        //sound = Resources.Load<AudioClip>("Audio/Item/Cabinet/Audio_1");
         audio.clip = sound;
 
         audio.playOnAwake = false;

@@ -23,7 +23,7 @@ public class Player : MoveObject
 	public Slider energy_Slider;
 
     [Header("Interact varible")]
-    public static float interaction_Range = 1.2f;
+    public static float interaction_Range = 10f;
 
     [Header("Movement varible")]
     public bool inMoved = false;
