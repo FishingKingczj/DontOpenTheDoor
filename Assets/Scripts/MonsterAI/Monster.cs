@@ -36,7 +36,7 @@ public class Monster : MonoBehaviour
     //private MonsterParameter monsterParameter;
 
     private float timer = 0;
-    private Vector2 brithposiotion = new Vector2();
+    private Vector2 birthposiotion = new Vector2();
     private GameObject aimObject;
     private Vector2 aimPoint;
     private ArrayList way = new ArrayList();
@@ -51,6 +51,16 @@ public class Monster : MonoBehaviour
         if (state.issueType.Equals(MonsterState.canAttack) && !state.stateType.Equals(MonsterState.beforeAttack)) timer = -1.0f;
         if (state.issueType.Equals(MonsterState.seePlayer) && (state.stateType.Equals(MonsterState.hangOut)|| state.stateType.Equals(MonsterState.goBack))) {
             timer = -1.0f;
+        }
+
+        if (state.stateType.Equals(MonsterState.hangOut)){
+            if (Vector2.Distance(aimPoint, (Vector2)transform.position) < 0.6f)
+                timer = -1.0f;
+        }
+        if (state.stateType.Equals(state.intentionType.Equals(MonsterState.goBack)))
+        {
+            if (Vector2.Distance(aimPoint, (Vector2)transform.position) < 0.6f)
+                timer = -1.0f;
         }
 
         if (timer < 0)
@@ -81,7 +91,7 @@ public class Monster : MonoBehaviour
             else if (state.intentionType.Equals(MonsterState.goBack))
             {
                 timer = monster_goBackTime;
-                aimPoint = brithposiotion;
+                aimPoint = birthposiotion;
             }
             else
                 timer = -1.0f;
@@ -135,6 +145,8 @@ public class Monster : MonoBehaviour
         }
     }
 
+    
+
     private void attack() {
         Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
         isBattle = true;
@@ -148,12 +160,19 @@ public class Monster : MonoBehaviour
     }
 
     private void faceTo(Vector2 targetPoint) {
+        float size;
+        if (transform.localScale.x > 0)
+            size = transform.localScale.x;
+        else
+            size = -transform.localScale.x;
         if (targetPoint.x < transform.position.x)
         {
-            transform.localEulerAngles = new Vector3(0, 180, 0);
+            
+                transform.localScale = new Vector3(-size, transform.localScale.y, transform.localScale.z);
         }
         else {
-            transform.localEulerAngles = new Vector3(0, 0, 0);
+            if (transform.localScale.y > 0)
+                transform.localScale = new Vector3(size, transform.localScale.y, transform.localScale.z);
         }
     }
 
@@ -179,7 +198,7 @@ public class Monster : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        brithposiotion = transform.position;
+        birthposiotion = transform.position;
         monsterAI = new MonsterAI(AIPath);
 
     }
@@ -188,6 +207,12 @@ public class Monster : MonoBehaviour
     void Update()
     {
         if (isBattle) return;
+        Debug.Log(transform.parent.position);
+        Debug.Log(transform.position);
+        Debug.Log(transform.localPosition);
+        birthposiotion = transform.parent.position+transform.localPosition;
+        Debug.Log(birthposiotion);
+
         if (visiable) Timer_AddPressurePoint();
 
         DecisionLayer();
@@ -304,7 +329,7 @@ public class MonsterAI
     {
         string[] lines = ReadInText.readin(AIPath);
         int count = 0;
-        while (count < lines.Length)
+        while (count < lines.Length-1)
         {
             ai.Add(lines[count + 0], lines[count + 1]);
             count = count + 2;

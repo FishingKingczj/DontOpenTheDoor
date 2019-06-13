@@ -130,7 +130,7 @@ Transform:
   m_GameObject: {fileID: 3730896031588353456}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_Children:
   - {fileID: 1393083279}
   m_Father: {fileID: 0}
@@ -167,14 +167,14 @@ MonoBehaviour:
   pressurePointIncrement: 1
   isBattle: 0
   monster_attackTime: 1
-  monster_attackScale: 5
+  monster_attackScale: 4
   monster_rushTime: 2
   monster_rushSpeed: 7
   monster_walkTime: 1
   monster_walkSpeed: 3.5
   monster_hangOutTime: 2
   monster_hangOutSpeed: 3
-  monster_hangOutScale: 10
+  monster_hangOutScale: 2
   monster_goBackSpeed: 3
   monster_beforeAttack: 1
   AIPath: Text/BoseAI

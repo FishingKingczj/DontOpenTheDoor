@@ -19,9 +19,8 @@ public class NPC : MonoBehaviour
     public string transforText;
 
     private GameObject findRoom(string roomName) {
-        return roomLoader.transform.Find(roomName).gameObject;
+        return roomLoader.transform.FindChild(roomName).gameObject;
     }
-
     private void detectionLayer() {
         //if (achievementID == player.GetComponent<Player>().achievementID) return;
 
@@ -75,7 +74,8 @@ public class NPC : MonoBehaviour
         string[] lines = ReadInText.readin(stateText);
         var count = 0;
         int i = 0;
-        while (count < lines.Length) {
+        Debug.Log(lines.Length);
+        while (count < lines.Length-1) {
             npcStates.Add(i, new NpcState(int.Parse(lines[count+0]), lines[count + 1], float.Parse(lines[count + 2]), float.Parse(lines[count + 3]), lines[count + 4], int.Parse(lines[count + 5]), int.Parse(lines[count + 6])));
             count = count + 7;
             i++;
@@ -84,8 +84,12 @@ public class NPC : MonoBehaviour
         lines = ReadInText.readin(transforText);
         count = 0;
         i = 0;
-        while (count < lines.Length)
+        while (count < lines.Length-1)
         {
+            Debug.Log(lines[count + 0]);
+            Debug.Log(lines[count + 1]);
+            Debug.Log(lines[count + 2]);
+            Debug.Log(lines[count + 3]);
             npcStateTransfor.Add(i, new StateTransfor(int.Parse(lines[count + 0]), int.Parse(lines[count + 1]), lines[count + 2], int.Parse(lines[count + 3])));
             count = count + 4;
             i++;
@@ -94,6 +98,7 @@ public class NPC : MonoBehaviour
         //npcStateTransfor.Add(1, new StateTransfor(1, 2, Player_NPCState.outRoom, 20));
 
         NpcState state = npcStates[stateID];
+        Debug.Log(stateID);
         room = findRoom(state.roomID);
         this.transform.SetParent(room.transform);
         this.transform.localPosition = new Vector3(state.localX, state.localY, this.transform.localPosition.z);

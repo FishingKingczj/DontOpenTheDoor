@@ -13,7 +13,10 @@ public class Occlusion : MonoBehaviour
                 collision.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
             }
             else {
-                collision.GetComponent<SpriteRenderer>().sortingLayerName = "AfterPlayer";
+                if (collision.GetComponent<SpriteRenderer>().sortingLayerName.Equals("BeforePlayer"))
+                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "AfterPlayer";
+                else
+                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "AAfterPlayer";
             }
 
             
@@ -29,7 +32,10 @@ public class Occlusion : MonoBehaviour
             }
             else
             {
-                collision.GetComponent<SpriteRenderer>().sortingLayerName = "BeforePlayer";
+                if (collision.GetComponent<SpriteRenderer>().sortingLayerName.Equals("AfterPlayer"))
+                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "BeforePlayer";
+                else
+                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "BBeforePlayer";
             }
         }
     }
