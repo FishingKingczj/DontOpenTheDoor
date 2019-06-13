@@ -4,19 +4,26 @@ using UnityEngine;
 
 public class RoomLoader : MonoBehaviour
 {
-    static public int ROOM_SIZE = 24;
-    private int UNIT_SIZE = 22;
+    //static public int ROOM_SIZE = 24;
+    static public int ROOM_SIZE_UD = 26;
+    static public int ROOM_SIZE_LR = 31;
+    private int UNIT_SIZE_UD = 25;
+    private int UNIT_SIZE_LR = 35;
+    private int PLAYER_MOVE_UD = 13;
+    private int PLAYER_MOVE_LR = 17;
 
     public List<Room> allRooms;
     public List<Room> activeRooms;
 
     public Room playerRoom;
     public MainCamera mainCamera;
+    public Transform player;
 
     // Start is called before the first frame update
     void Start()
     {
         initRooms();
+        player = GameObject.Find("player").transform;
     }
 
     // 初始化房间
@@ -72,22 +79,22 @@ public class RoomLoader : MonoBehaviour
         Vector3 pos = playerRoom.transform.position;
         if (playerRoom.up && !activeRooms.Contains(playerRoom.up))
         {
-            ActiveRoom(playerRoom.up, pos + new Vector3(0, UNIT_SIZE, 0));
+            ActiveRoom(playerRoom.up, pos + new Vector3(0, UNIT_SIZE_UD, 0));
         }
 
         if (playerRoom.down && !activeRooms.Contains(playerRoom.down))
         {
-            ActiveRoom(playerRoom.down, pos + new Vector3(0, -UNIT_SIZE, 0));
+            ActiveRoom(playerRoom.down, pos + new Vector3(0, -UNIT_SIZE_UD, 0));
         }
 
         if (playerRoom.left && !activeRooms.Contains(playerRoom.left))
         {
-            ActiveRoom(playerRoom.left, pos + new Vector3(-UNIT_SIZE, 0, 0));
+            ActiveRoom(playerRoom.left, pos + new Vector3(-UNIT_SIZE_LR, 0, 0));
         }
 
         if (playerRoom.right && !activeRooms.Contains(playerRoom.right))
         {
-            ActiveRoom(playerRoom.right, pos + new Vector3(UNIT_SIZE, 0, 0));
+            ActiveRoom(playerRoom.right, pos + new Vector3(UNIT_SIZE_LR, 0, 0));
         }
     }
 
@@ -104,7 +111,7 @@ public class RoomLoader : MonoBehaviour
     }
 
     // 玩家进入一个房间时，调用
-    public void Enter(Room room, Item_Door door)
+    public void Enter(Room room)
     {
         Debug.Log("进入房间" + room.name);
         if (playerRoom == room)
@@ -115,33 +122,36 @@ public class RoomLoader : MonoBehaviour
 
         activeRooms.Clear();
         Vector3 target = new Vector3();
-
         if (playerRoom.up == room)
         {
-            Vector3 vector = new Vector3(0, UNIT_SIZE, 0);
+            Vector3 vector = new Vector3(0, UNIT_SIZE_UD, 0);
             target = playerRoom.transform.position + vector;
+            player.position = player.position + new Vector3(0, PLAYER_MOVE_UD, 0);
         }
         else if (playerRoom.down == room)
         {
-            Vector3 vector = new Vector3(0, -UNIT_SIZE, 0);
+            Vector3 vector = new Vector3(0, -UNIT_SIZE_UD, 0);
             target = playerRoom.transform.position + vector;
+            player.position = player.position + new Vector3(0, -PLAYER_MOVE_UD, 0);
         }
         else if (playerRoom.left == room)
         {
-            Vector3 vector = new Vector3(-UNIT_SIZE, 0, 0);
+            Vector3 vector = new Vector3(-UNIT_SIZE_LR, 0, 0);
             target = playerRoom.transform.position + vector;
+            player.position = player.position + new Vector3(-PLAYER_MOVE_LR, 0, 0);
         }
         else if (playerRoom.right == room)
         {
-            Vector3 vector = new Vector3(UNIT_SIZE, 0, 0);
+            Vector3 vector = new Vector3(UNIT_SIZE_LR, 0, 0);
             target = playerRoom.transform.position + vector;
+            player.position = player.position + new Vector3(PLAYER_MOVE_LR, 0, 0);
         }
         else
         {
             Debug.LogError("房间进入错误" + room.name);
             return;
         }
-        // 更新玩家位置
+        // 更新玩家房间
         playerRoom = room;
         // 激活房间
         ActiveRoom(room, target);
@@ -153,7 +163,14 @@ public class RoomLoader : MonoBehaviour
     {
         return playerRoom;
     }
-    public void SetPlayerRoom(Room _room) {
+
+    public Vector3 GetCenter()
+    {
+        return playerRoom.transform.position;
+    }
+
+    public void SetPlayerRoom(Room _room)
+    {
         playerRoom = _room;
     }
 
