@@ -12,6 +12,7 @@ public class Monster : MonoBehaviour
     public bool visiable = false;
     public float timer_Standard = 1.0f;
     public float pressurePointIncrement = 1.0f;
+    public bool isBattle = false;
 
     //monster parameter
     public float monster_attackTime = 1.0f;
@@ -25,6 +26,7 @@ public class Monster : MonoBehaviour
     public float monster_hangOutScale = 10.0f;
     private float monster_goBackTime = 1000000.0f;
     public float monster_goBackSpeed = 1.0f;
+    public float monster_beforeAttack = 1.0f;
 
     /************************/
 
@@ -46,7 +48,7 @@ public class Monster : MonoBehaviour
     }
     protected void DecisionLayer()
     {
-        if (state.issueType.Equals(MonsterState.canAttack)) timer = -1.0f;
+        if (state.issueType.Equals(MonsterState.canAttack) && !state.stateType.Equals(MonsterState.beforeAttack)) timer = -1.0f;
         if (state.issueType.Equals(MonsterState.seePlayer) && (state.stateType.Equals(MonsterState.hangOut)|| state.stateType.Equals(MonsterState.goBack))) {
             timer = -1.0f;
         }
@@ -67,9 +69,9 @@ public class Monster : MonoBehaviour
                 aimPoint = (Vector2)aimObject.transform.position;
                 timer = monster_walkTime;
             }
-            else if (state.intentionType.Equals(MonsterState.attack))
+            else if (state.intentionType.Equals(MonsterState.beforeAttack))
             {
-                timer = monster_attackTime;
+                timer = monster_beforeAttack;
             }
             else if (state.intentionType.Equals(MonsterState.hangOut))
             {
@@ -101,13 +103,17 @@ public class Monster : MonoBehaviour
             anim.SetInteger("state", 1);
             straightMove(aimPoint, monster_rushSpeed);
         }
+        else if (state.intentionType.Equals(MonsterState.beforeAttack))
+        {
+            anim.SetInteger("state", 2);
+        }
         else if (state.intentionType.Equals(MonsterState.attack))
         {
-
-            // 触发逃脱模式
-            anim.SetInteger("state",2);
             attack();
-            
+        }
+        else if (state.intentionType.Equals(MonsterState.skill))
+        {
+            skill();
         }
         else if (state.intentionType.Equals(MonsterState.goBack))
         {
@@ -131,7 +137,14 @@ public class Monster : MonoBehaviour
 
     private void attack() {
         Debug.Log("怪物触碰玩家->怪物进入攻击模式并通知玩家进入逃生模式");
+        isBattle = true;
         this.GetComponent<Monster_Battle>().StartAttack(GameObject.Find("player").gameObject);
+    }
+
+    private void skill()
+    {
+        if (GameObject.Find("RoomLoader").GetComponent<RoomLoader>().playerRoom.name.Equals(transform.parent.name))
+            PlayerEvent.die();
     }
 
     private void faceTo(Vector2 targetPoint) {
@@ -174,6 +187,7 @@ public class Monster : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isBattle) return;
         if (visiable) Timer_AddPressurePoint();
 
         DecisionLayer();
@@ -196,8 +210,6 @@ public class Monster : MonoBehaviour
                 if (Vector2.Distance((Vector2) feeledObject.transform.position, (Vector2) transform.position)< monster_attackScale)
                     state.issueType = MonsterState.canAttack;
             }
-
-            
         }
         //Debug.Log(state.issueType);
     }
@@ -282,29 +294,6 @@ public class State
     }
 }
 
-/*public class MonsterParameter
-{
-    private Dictionary<string, float> para = new Dictionary<string, float>();
-    public MonsterParameter(float _attackTime, float _attackScale,float _walkTime,float _walkSpeed,float _rushTime,float _rushSpeed)
-    {
-        //读入配置表
-        para.Add("attack", _attackTime);
-        para.Add("attackScale", _attackScale);
-        para.Add("walk", _walkTime);
-        para.Add("walkSpeed", _walkSpeed);
-        para.Add("rush", _rushTime);
-        para.Add("rushSpeed", _rushSpeed);
-    }
-    public float getParameter(string parameterName)
-    {
-        if (para.ContainsKey(parameterName))
-        {
-            return para[parameterName];
-        }
-        return -1.0f;
-    }
-}*/
-
 public class MonsterAI
 {
     public Dictionary<string, string> ai = new Dictionary<string, string>();
@@ -342,7 +331,9 @@ public static class MonsterState
     public static string walk = "walk";
     public static string rush = "rush";
     public static string goBack = "goBack";
+    public static string beforeAttack = "beforeAttack";
     public static string attack = "attack";
+    public static string skill = "skill";
 
     public static string seeNothing = "seeNothing";
     public static string seePlayer = "seePlayer";
