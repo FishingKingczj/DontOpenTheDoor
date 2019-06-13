@@ -19,8 +19,9 @@ public class NPC : MonoBehaviour
     public string transforText;
 
     private GameObject findRoom(string roomName) {
-        return roomLoader.transform.FindChild(roomName).gameObject;
+        return roomLoader.transform.Find(roomName).gameObject;
     }
+
     private void detectionLayer() {
         //if (achievementID == player.GetComponent<Player>().achievementID) return;
 

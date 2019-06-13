@@ -57,7 +57,7 @@ public class Item_Cabinet : Item
         inOpened = true;
         
         //TODO animation
-        this.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Image/Item/Cabinet_Open");
+        this.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Image/Item/箱子-打开");
 
         audio.loop = false;
         audio.Stop();

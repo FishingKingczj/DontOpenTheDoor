@@ -44,7 +44,6 @@ public class Player : MoveObject
 
     public bool inEscape = false;
 
-    [Range(0,MAXESCAPEPOINT)]
     public float escapePoint = 0.0f;
 
     private const float STARTESCAPEUSAGETIME = 1.0f;
@@ -89,9 +88,9 @@ public class Player : MoveObject
 #endif
 
 #if UNITY_STANDALONE_WIN
-            PlayerRush();
-            PlayerMove();
-            PlayerInteract();
+            //PlayerRush();
+            //PlayerMove();
+            //PlayerInteract();
 #endif
     }
 
@@ -342,6 +341,10 @@ public class Player : MoveObject
 
         // 清除背包中任意操作
         this.GetComponent<Player_BackPack>().ExitMultipleSelectMode();
+
+        // 淡入QTE场景
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.AddComponent<UI_FadeIn>();
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.GetComponent<UI_BattleBackgroup>().enabled = true;
     }
     public void ExitEscapeMode() {
         this.GetComponent<Player_BackPack>().EnableBackpack();
@@ -354,6 +357,10 @@ public class Player : MoveObject
 
         GameObject.Find("Canvas_UI").transform.Find("Button_Block").gameObject.SetActive(false);
         GameObject.Find("Canvas_UI").transform.Find("Slider_EscapePoint").gameObject.SetActive(false);
+
+        // 淡出QTE场景
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.GetComponent<UI_BattleBackgroup>().enabled = false;
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.AddComponent<UI_FadeOut>();
     }
 
     // 逃脱模式检测
@@ -365,9 +372,9 @@ public class Player : MoveObject
 
             if (escapePoint <= 0)
             {
-                Debug.Log("玩家死亡 逃生点 0");
-                ExitEscapeMode();
-                SceneManager.LoadScene(0);
+                //Debug.Log("玩家死亡 逃生点 0");
+                //ExitEscapeMode();
+                //SceneManager.LoadScene(0);
             }
 
             else if (escapePoint >= 50) {

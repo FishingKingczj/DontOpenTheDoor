@@ -34,6 +34,7 @@ public class MainCamera : MonoBehaviour
         if (!inMoving)
             Follow();
         else {
+            /* 因更改人物在房间之间的移动方式 取消摄像机房间切换
             transform.position = Vector3.MoveTowards(transform.position, nextRoomPoint, MOVE_SPEED * Time.deltaTime);
             if (transform.position.Equals(nextRoomPoint) && refresh)
             {
@@ -41,6 +42,7 @@ public class MainCamera : MonoBehaviour
                 loader.ActiveAroundRoom();
                 inMoving = false;
             }
+            */
         }
     }
 
@@ -80,8 +82,10 @@ public class MainCamera : MonoBehaviour
         position.x = Mathf.Lerp(this.transform.position.x, player.transform.position.x, interpolation);
         position.z = -10.0f;
 
+        /* 因更改移动方式所以取消摄像机在房间限制
         position.x = Mathf.Clamp(position.x, currentRoomCenterPoint.x + -(RoomLoader.ROOM_SIZE_LR / 2) + camera.orthographicSize, currentRoomCenterPoint.x + (RoomLoader.ROOM_SIZE_LR / 2) - camera.orthographicSize);
         position.y = Mathf.Clamp(position.y, currentRoomCenterPoint.y + -(RoomLoader.ROOM_SIZE_UD / 2) + camera.orthographicSize, currentRoomCenterPoint.y + (RoomLoader.ROOM_SIZE_UD / 2) - camera.orthographicSize);
+        */
 
         this.transform.position = position;
     }

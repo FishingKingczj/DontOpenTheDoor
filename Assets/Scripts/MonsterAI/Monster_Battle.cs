@@ -69,6 +69,9 @@ public class Monster_Battle : MonoBehaviour
     public List<float> time_CurrentAttackSequencePerfectBlockEnd;
     public List<float> time_CurrentAttackSequenceEnd;
 
+    [Header("Monster_BattleSceneObject")]
+    public Monster_BattleScene monster_BattleScene;
+
     [Header("Player Infomation")]
     public GameObject player;
     public Joystick joystick;
@@ -93,6 +96,8 @@ public class Monster_Battle : MonoBehaviour
     {
         joystick = GameObject.Find("Canvas_UI").transform.Find("Joystick").gameObject.GetComponent<Joystick>();
         attackGroupSize = attackGroup.Count;
+
+        monster_BattleScene = GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Monster_BattleScene").gameObject.GetComponent<Monster_BattleScene>();
     }
 
     void FixedUpdate()
@@ -134,6 +139,9 @@ public class Monster_Battle : MonoBehaviour
                             // 到达 攻击结束点(一段攻击的最终点)
                             if (time_CurrentAttackSequenceEnd.Count != 0 && timer_CurrentAttackSequence >= time_CurrentAttackSequenceEnd[0])
                             {
+                                // 关闭怪物战斗画面
+                                monster_BattleScene.SetEnable(false);
+
                                 Debug.Log("攻击结束");
 
                                 time_CurrentAttackSequenceEnd.RemoveAt(0);
@@ -158,11 +166,9 @@ public class Monster_Battle : MonoBehaviour
                                 currentAttackType = currentAttackSequence[0];
                                 time_CurrentAttackSequenceStart.RemoveAt(0);
 
-                                // 生成提示(测试用)
-                                GameObject arrow = GameObject.Instantiate(Resources.Load<GameObject>("Prefabs/UI/Arrow"));
-                                arrow.transform.SetParent(GameObject.Find("Canvas_UI").GetComponent<Transform>());
-                                arrow.GetComponent<QTE_Arrow>().Initial(attackType[currentAttackType].time_BefroeAttack, attackType[currentAttackType].time_Attack,currentAttackType);
-                                arrow.transform.position = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 2, 0);
+                                // 战斗画面怪物播放动画
+                                monster_BattleScene.SetEnable(true);
+                                monster_BattleScene.PlayAnimation(currentAttackType);
 
                                 currentAttackSequence.RemoveAt(0);
                             }
@@ -237,6 +243,8 @@ public class Monster_Battle : MonoBehaviour
         finishedJudgement = false;
 
         currentPlayerJudgement = Judgement.None;
+
+        monster_BattleScene.SetEnable(false);
     }
 
     // 载入攻击指令
@@ -551,28 +559,43 @@ public class Monster_Battle : MonoBehaviour
                 }
             case Judgement.Roll: {
                     Debug.Log("玩家翻滚");
+
+                    GameObject go = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/QTE_Feedback"));
+                    go.GetComponent<QTE_Feedback>().SetSprite(0, _dir);
                     break;
                 }
             case Judgement.Block: {
                     Debug.Log("玩家普通格挡");
                     player.SendMessage("AddPressurePoint", pressurePointIncrementWhenHitted, SendMessageOptions.DontRequireReceiver);
+
+                    GameObject go = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/QTE_Feedback"));
+                    go.GetComponent<QTE_Feedback>().SetSprite(1);
                     break;
                 }
             case Judgement.Hitted: {
                     Debug.Log("玩家被击中 减少逃生点 : " + attackType[_dir].damage);
                     player.SendMessage("AddPressurePoint", pressurePointIncrementWhenHitted, SendMessageOptions.DontRequireReceiver);
                     player.SendMessage("ReduceEscapePoint", attackType[_dir].damage,SendMessageOptions.DontRequireReceiver);
+
+                    GameObject go = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/QTE_Feedback"));
+                    go.GetComponent<QTE_Feedback>().SetSprite(2);
                     break;
                 }
             case Judgement.HittedBlock: {
                     Debug.Log("玩家格挡受击 额外减少体力 : " + attackType[_dir].energyExpendIfBlock);
                     player.SendMessage("AddPressurePoint", pressurePointIncrementWhenHitted, SendMessageOptions.DontRequireReceiver);
                     player.SendMessage("ReduceEnergy", attackType[_dir].energyExpendIfBlock, SendMessageOptions.DontRequireReceiver);
+
+                    GameObject go = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/QTE_Feedback"));
+                    go.GetComponent<QTE_Feedback>().SetSprite(3);
                     break;
                 }
             case Judgement.PerfectBlock: {
                     Debug.Log("玩家完美格挡 增加逃生点 : 20");
                     player.SendMessage("AddEscapePoint", 20, SendMessageOptions.DontRequireReceiver);
+
+                    GameObject go = GameObject.Instantiate<GameObject>(Resources.Load<GameObject>("Prefabs/UI/QTE_Feedback"));
+                    go.GetComponent<QTE_Feedback>().SetSprite(4);
                     break;
                 }
             default:break;

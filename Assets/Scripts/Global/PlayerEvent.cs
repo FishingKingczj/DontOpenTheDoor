@@ -12,7 +12,7 @@ public class PlayerEvent : MonoBehaviour
 
     private GameObject findRoom(string roomName)
     {
-        return roomLoader.transform.FindChild(roomName).gameObject;
+        return roomLoader.transform.Find(roomName).gameObject;
     }
 
     public static void die() {
