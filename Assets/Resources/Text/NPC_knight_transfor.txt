@@ -1,2 +1,5 @@
-0 1 inRoom 10
-1 2 outRoom 20
+0;1;inRoom;10
+1;2;inRoom;20
+2;3;inRoom;30
+3;4;inRoom;40
+4;5;inRoom;50

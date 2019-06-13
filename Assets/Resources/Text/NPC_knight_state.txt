@@ -1,3 +1,6 @@
-0 Room1 3 3 hi -1 10
-1 Room1 3 3 hi222 0 20
-2 Room2 0 0 test -1 30
+0;Room1;8;1;Hi, dirty boy, what are you doing here?;-1;10
+1;Room1;8;1;This is a place where the more you struggle, the deeper you fall.;-1;20
+2;Room1;8;1;If you believe me, stay away from these doors, then you can live longer.;-1;30
+3;Room1;8;1;As for me, I am going to seek my treasure in such a desperate place.;-1;40
+4;Room1;8;1;It's nice to meet something alive and have a talk, and this is my little gift for you.;0;50
+5;Room1;8;1;Bye, my friend.-1;60
