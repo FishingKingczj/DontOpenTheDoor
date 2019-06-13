@@ -127,7 +127,6 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  progressRing: {fileID: 0}
   inLocked: 0
   inOpened: 0
   pairingValue: 0
@@ -203,7 +202,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 3aed7794ebd61ba4d933d8e413d72f67, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -211,7 +210,7 @@ SpriteRenderer:
   m_Size: {x: 20, y: 20}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 1
   m_SpriteSortPoint: 0
 --- !u!1 &2630681780947982639
@@ -636,7 +635,6 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  progressRing: {fileID: 0}
   inLocked: 0
   inOpened: 0
   pairingValue: 0
@@ -770,7 +768,6 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  progressRing: {fileID: 0}
   inLocked: 0
   inOpened: 0
   pairingValue: 0
@@ -904,7 +901,6 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  progressRing: {fileID: 0}
   inLocked: 0
   inOpened: 0
   pairingValue: 0
