@@ -17,7 +17,7 @@ beforeAttack_seeNothing hangOut
 beforeAttack_seeDoor hangOut
 beforeAttack_seeCollision walk
 beforeAttack_seePlayer walk
-beforeAttack_canAttack attack
+beforeAttack_canAttack skill
 hangOut_seeNothing goBack
 hangOut_seeDoor goBack
 hangOut_seeCollision walk
@@ -33,8 +33,8 @@ error_seeDoor error
 error_seeCollision error
 error_seePlayer error
 error_canAttack error
-attack_seeNothing hangOut
-attack_seeDoor hangOut
-attack_seeCollision walk
-attack_seePlayer walk
-attack_canAttack beforeAttack
+skill_seeNothing hangOut
+skill_seeDoor hangOut
+skill_seeCollision walk
+skill_seePlayer walk
+skill_canAttack beforeAttack

@@ -210,6 +210,7 @@ public class Monster_Battle : MonoBehaviour
 
     // 结束攻击(玩家死亡或逃脱)
     public void EndAttack() {
+        this.transform.GetComponent<Monster>().isBattle = false;
         Debug.Log("怪兽结束攻击");
         inAttack = false;
         player = null;
