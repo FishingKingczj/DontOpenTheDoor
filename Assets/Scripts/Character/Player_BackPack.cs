@@ -349,15 +349,19 @@ public class Player_BackPack : MonoBehaviour
             if (!selectIndex.Contains(_index - 1))
             {
                 // 选中提示
-                backpack[_index - 1].GetComponent<Image>().color = Color.red;
+                Color c = backpack[_index - 1].GetComponent<Image>().color;
+                c.a = 1;
+                backpack[_index - 1].GetComponent<Image>().color = c;
 
                 selectIndex.Add(_index - 1);
             }
             // 取消选择
-            else { 
+            else {
 
                 // 取消选中提示
-                backpack[_index - 1].GetComponent<Image>().color = Color.white;
+                Color c = backpack[_index - 1].GetComponent<Image>().color;
+                c.a = 0;
+                backpack[_index - 1].GetComponent<Image>().color = c;
 
                 selectIndex.Remove(_index - 1);
             }
@@ -390,7 +394,9 @@ public class Player_BackPack : MonoBehaviour
     // 重设所有选中提示
     public void ResetSelectedPrompt() {
         for (int i = 0; i < maxStorageAmount; i++) {
-            backpack[i].GetComponent<Image>().color = Color.white;
+            Color c = backpack[i].GetComponent<Image>().color;
+            c.a = 0;
+            backpack[i].GetComponent<Image>().color = c;
         }
     }
         
