@@ -1,0 +1,269 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &2930119223585353305
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2930119223585353316}
+  - component: {fileID: 2930119223585353319}
+  - component: {fileID: 2930119223585353318}
+  - component: {fileID: 4276068309023512215}
+  - component: {fileID: 2973010599589795663}
+  - component: {fileID: 8682730706157777508}
+  - component: {fileID: 5123756909126526272}
+  - component: {fileID: 1225266608668049195}
+  m_Layer: 0
+  m_Name: monster1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2930119223585353316
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.96, y: 0, z: 0}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!212 &2930119223585353319
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: -2113000603
+  m_SortingLayer: 3
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: add70ad771eada048a8950d1121f642e, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 19.99, y: 15.6}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!95 &2930119223585353318
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c365013fe1e41f34daa438a5ce3dc6e2, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &4276068309023512215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a766b222ec698a842b7700ffb5c3db6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  anim: {fileID: 2930119223585353318}
+  visiable: 0
+  timer_Standard: 1
+  pressurePointIncrement: 1
+  isBattle: 
+  monster_attackTime: 1
+  monster_attackScale: 3
+  monster_rushTime: 2
+  monster_rushSpeed: 6
+  monster_walkTime: 2
+  monster_walkSpeed: 2.5
+  monster_hangOutTime: 2
+  monster_hangOutSpeed: 2.5
+  monster_hangOutScale: 1
+  monster_goBackSpeed: 2.5
+  monster_beforeAttack: 0.1
+  AIPath: Text/BaseAI
+--- !u!114 &2973010599589795663
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65f405d70065ef64abbdd199ad622888, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  monsterSize: 0.5
+--- !u!58 &8682730706157777508
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 4, y: 0}
+  serializedVersion: 2
+  m_Radius: 15
+--- !u!58 &5123756909126526272
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: -2.6192887, y: -4.656515}
+  serializedVersion: 2
+  m_Radius: 1.9043087
+--- !u!114 &1225266608668049195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2930119223585353305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6000f96ca9374a446ad77ab7afc2d74c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackGroup:
+  - attackTime: 3
+    attackTimeRandomRange: 0.5
+    attackSequenceIndex: 0300000004000000
+    probability:
+    - 50
+    - 50
+  - attackTime: 8
+    attackTimeRandomRange: 0.5
+    attackSequenceIndex: 0100000002000000
+    probability:
+    - 50
+    - 50
+  - attackTime: 13
+    attackTimeRandomRange: 0.5
+    attackSequenceIndex: 00000000
+    probability:
+    - 100
+  - attackTime: 18
+    attackTimeRandomRange: 0.5
+    attackSequenceIndex: 010000000200000000000000
+    probability:
+    - 30
+    - 30
+    - 40
+  - attackTime: 23
+    attackTimeRandomRange: 0.5
+    attackSequenceIndex: 0300000004000000
+    probability:
+    - 3
+    - 4
+  attackSequence:
+  - attackType: 0000000001000000000000000100000002000000
+  - attackType: 010000000000000001000000
+  - attackType: 000000000100000000000000
+  - attackType: 0000000002000000
+  - attackType: 0100000002000000
+  attackType:
+  - damage: 10
+    energyExpendIfBlock: 3
+    time_BefroeAttack: 1
+    time_Attack: 1
+    time_PerfectBlock: 0.5
+  - damage: 10
+    energyExpendIfBlock: 3
+    time_BefroeAttack: 1
+    time_Attack: 1
+    time_PerfectBlock: 0.5
+  - damage: 20
+    energyExpendIfBlock: 6
+    time_BefroeAttack: 2
+    time_Attack: 1
+    time_PerfectBlock: 0.5
+  inAttack: 0
+  attackCommandTimeList: []
+  attackCommandSequenceList: 
+  time_AttackCommand: 0
+  timer_AttackCommand: 0
+  currentAttackType: -1
+  inAttackSequence: 0
+  inAttackingJudgment: 0
+  inPerfectBlockJudgement: 0
+  currentAttackSequence: 
+  time_CurrentAttackSequence: 0
+  timer_CurrentAttackSequence: 0
+  time_CurrentAttackSequenceStart: []
+  time_CurrentAttackSequenceStartAttack: []
+  time_CurrentAttackSequencePerfectBlockEnd: []
+  time_CurrentAttackSequenceEnd: []
+  monster_BattleScene: {fileID: 0}
+  player: {fileID: 0}
+  joystick: {fileID: 0}
+  finishedJudgement: 0
+  blocked: 0
+  pressurePointIncrementWhenHitted: 5
+  currentPlayerJudgement: -1

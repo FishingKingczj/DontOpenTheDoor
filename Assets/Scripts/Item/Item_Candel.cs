@@ -8,7 +8,7 @@ public class Item_Candel : Item
     {
         id = 6;
         name = "Candel";
-        description = "这是一根蜡烛";
+        description = "This is a candel.";
 
         pickable = true;
 

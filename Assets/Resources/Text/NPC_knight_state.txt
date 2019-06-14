@@ -1,3 +1,27 @@
-0 Room1 3 3 hi -1 10
-1 Room1 3 3 hi222 0 20
-2 Room2 0 0 test -1 30
+0;Room1;8;1;Hi, dirty boy, what are you doing here?;-1;10
+1;Room1;8;1;This is a place where the more you struggle, the deeper you fall.;-1;20
+2;Room1;8;1;If you believe me, stay away from these doors, then you can live longer.;-1;30
+3;Room1;8;1;As for me, I am going to seek my treasure in such a desperate place.;-1;40
+4;Room1;8;1;It's nice to meet something alive and have a talk, and this is my little gift for you.;0;50
+5;Room1;8;1;Bye, my friend.;-1;60
+6;Room6;-8;-2;Ah,it's great to see you still alive, my friend.;-1;70
+7;Room6;-8;-2;Do you know the story about humanity in the first era.;-1;80
+8;Room6;-8;-2;Humans bathe in the glory of the Seven Gods and rule the ground.;-1;90
+9;Room6;-8;-2;What a golden age!;-1;100
+10;Room6;-8;-2;But now humans can only hide in this dim, dirty, desperate dungeon. Just live like a mouse.;-1;110
+11;Room6;-8;-2;This is not the glory of my generation.;-1;120
+12;Room6;-8;-2;Fortunately, I think I will find my treasure soon.;-1;130
+13;Room6;-8;-2;I heard that the way to get out of here was buried deep in the dungeon and the secret is just related to the murals in the dungeon.;-1;140
+14;Room6;-8;-2;If you find something, please let me know, my friend.;-1;150
+15;Room6;-8;-2;But the premise is that you can live.;-1;160
+16;Room6;-8;-2;I think this is some food you need;0;170
+17;Room6;-8;-2;GoodBye;-1;180
+18;Room14;8;1;We are going to succeed, and glory will come to our generation.;-1;190
+19;Room14;8;1;This is the key to the exit, and the door is on the left side of the starting point.;-1;200
+20;Room14;8;1;Equip yourself and here we go;0;210
+21;Room14;8;1;Let's go, my friend!;-1;220
+22;Room17;8;1;This is an altar and there must be a sacrifice;-1;230
+23;Room17;8;1;This is my mission to witness your many deaths and ultimate success.;-1;240
+24;Room17;8;1;Please bring my flesh and blood to leave here.;-1;250
+25;Room17;8;1;It's time to get the glory of my generation.Goodbye, My friend;8;260
+26;Room17;-1000000;-100000;It¡¯s time to get the glory of my generation.Goodbye, My friend;-1;270

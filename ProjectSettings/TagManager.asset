@@ -44,6 +44,12 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: AAfterPlayer
+    uniqueID: 1945727791
+    locked: 0
+  - name: AfterPlayer
+    uniqueID: 2790371277
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
@@ -55,6 +61,12 @@ TagManager:
     locked: 0
   - name: Monster
     uniqueID: 2181966693
+    locked: 0
+  - name: BeforePlayer
+    uniqueID: 3786948243
+    locked: 0
+  - name: BBeforePlayer
+    uniqueID: 4060595269
     locked: 0
   - name: UI
     uniqueID: 3489790489

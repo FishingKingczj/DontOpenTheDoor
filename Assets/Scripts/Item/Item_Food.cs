@@ -11,7 +11,7 @@ public class Item_Food : Item
     {
         id = 0;
         name = "Food";
-        description = "这是一袋大米,恢复10点体力";
+        description = "This is food to restore 10 Restore physical strength";
 
         pickable = true;
 
@@ -19,8 +19,6 @@ public class Item_Food : Item
         timer_UsageTime = usageTime;
 
         maxStorageAmount = 5;
-
-        progressRing = GameObject.Find("Canvas_UI").transform.Find("ProgressRing").GetComponent<Image>();
     }
 
     // 使用效果

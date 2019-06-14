@@ -15,15 +15,6 @@ public class Room : MonoBehaviour
     private Item_Door doorLeft;
     private Item_Door doorRight;
 
-    void OnTriggerEnter2D(Collider2D collider)
-    {
-        if (collider.tag.Contains("Player"))
-        {
-            RoomLoader loader = GameObject.Find("RoomLoader").GetComponent<RoomLoader>();
-            loader.Enter(this, null);
-        }
-    }
-
     // 检查房间的连接，关闭不存在的门
     public void CheckRoom()
     {
@@ -36,18 +27,33 @@ public class Room : MonoBehaviour
         if (!up)
         {
             doorUp.Disable();
+        } else
+        {
+            transform.Find("Eup").GetComponent<EnterEvent>().enter = up;
         }
         if (!down)
         {
             doorDown.Disable();
         }
+        else
+        {
+            transform.Find("Edown").GetComponent<EnterEvent>().enter = down;
+        }
         if (!left)
         {
             doorLeft.Disable();
         }
+        else
+        {
+            transform.Find("Eleft").GetComponent<EnterEvent>().enter = left;
+        }
         if (!right)
         {
             doorRight.Disable();
+        }
+        else
+        {
+            transform.Find("Eright").GetComponent<EnterEvent>().enter = right;
         }
     }
 

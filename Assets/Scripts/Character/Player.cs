@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 public class Player : MoveObject
 {
     public int achievementID = 0;
+    public Animator anim;
 
     private const float DEFAULT_MAXENERGY = 100.0f;
 	[Header("Energy varible")]
@@ -22,7 +23,7 @@ public class Player : MoveObject
 	public Slider energy_Slider;
 
     [Header("Interact varible")]
-    public static float interaction_Range = 1.2f;
+    public static float interaction_Range = 10f;
 
     [Header("Movement varible")]
     public bool inMoved = false;
@@ -43,7 +44,6 @@ public class Player : MoveObject
 
     public bool inEscape = false;
 
-    [Range(0,MAXESCAPEPOINT)]
     public float escapePoint = 0.0f;
 
     private const float STARTESCAPEUSAGETIME = 1.0f;
@@ -59,6 +59,7 @@ public class Player : MoveObject
     public float pressurePointIncrementWhenStartQTE = 10.0f;
 
 	void Start(){
+
         //CircleCollider2D box = gameObject.AddComponent<CircleCollider2D>();
         //box.radius = interaction_Range;
         //box.isTrigger = true;
@@ -87,9 +88,9 @@ public class Player : MoveObject
 #endif
 
 #if UNITY_STANDALONE_WIN
-            PlayerRush();
-            PlayerMove();
-            PlayerInteract();
+            //PlayerRush();
+            //PlayerMove();
+            //PlayerInteract();
 #endif
     }
 
@@ -118,16 +119,18 @@ public class Player : MoveObject
 
         if (vector != Vector3.zero)
         {
+
             SetInMoved(true);
             currentMovement = CurrentMovement.Run;
 
             Dialog.CloseDialog();
         }
         else {
+            anim.SetInteger("state", 0);
             SetInMoved(false);
             currentMovement = CurrentMovement.Idle;
         }
-
+        
         Move(vector);
     }
 
@@ -136,6 +139,7 @@ public class Player : MoveObject
     {
         if (energy_Current <= 0 || this.GetComponent<Player_BackPack>().GetInCompositeMode()) return;
         if (dir == Vector3.zero) {
+            anim.SetInteger("state", 0);
             currentMovement = CurrentMovement.Idle;
             return;
         }
@@ -143,19 +147,23 @@ public class Player : MoveObject
         Dialog.CloseDialog();
         Vector3 vector = dir;
 
+        
         Move(vector);
     }
 
     // 控制人物冲刺
     private void PlayerRush()
     {
+        
         if (Input.GetKey(KeyCode.Space))
         {
+            anim.SetInteger("state", 1);
             currentMovement = CurrentMovement.Rush;
             setSpeed(RUSH_SPEED + extra_Speed);
         }
         else
         {
+            anim.SetInteger("state", 2);
             currentMovement = CurrentMovement.Run;
             setSpeed(DEFAULT_SPEED + extra_Speed);
         }
@@ -166,11 +174,13 @@ public class Player : MoveObject
     {
         if (inRushed)
         {
+            anim.SetInteger("state", 1);
             currentMovement = CurrentMovement.Rush;
             setSpeed(RUSH_SPEED + extra_Speed);
         }
         else
         {
+            anim.SetInteger("state", 2);
             currentMovement = CurrentMovement.Run;
             setSpeed(DEFAULT_SPEED + extra_Speed);
         }
@@ -217,7 +227,6 @@ public class Player : MoveObject
 
                     item.SendMessage("Interact", this.gameObject, SendMessageOptions.DontRequireReceiver);
                 }
-
             }
         }
     }
@@ -332,6 +341,10 @@ public class Player : MoveObject
 
         // 清除背包中任意操作
         this.GetComponent<Player_BackPack>().ExitMultipleSelectMode();
+
+        // 淡入QTE场景
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.AddComponent<UI_FadeIn>();
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.GetComponent<UI_BattleBackgroup>().enabled = true;
     }
     public void ExitEscapeMode() {
         this.GetComponent<Player_BackPack>().EnableBackpack();
@@ -344,6 +357,10 @@ public class Player : MoveObject
 
         GameObject.Find("Canvas_UI").transform.Find("Button_Block").gameObject.SetActive(false);
         GameObject.Find("Canvas_UI").transform.Find("Slider_EscapePoint").gameObject.SetActive(false);
+
+        // 淡出QTE场景
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.GetComponent<UI_BattleBackgroup>().enabled = false;
+        GameObject.Find("Canvas_UI").transform.Find("Canvas_Battle").transform.Find("Backgroup").gameObject.AddComponent<UI_FadeOut>();
     }
 
     // 逃脱模式检测
@@ -355,9 +372,9 @@ public class Player : MoveObject
 
             if (escapePoint <= 0)
             {
-                Debug.Log("玩家死亡 逃生点 0");
-                ExitEscapeMode();
-                SceneManager.LoadScene(0);
+                //Debug.Log("玩家死亡 逃生点 0");
+                //ExitEscapeMode();
+                //SceneManager.LoadScene(0);
             }
 
             else if (escapePoint >= 50) {

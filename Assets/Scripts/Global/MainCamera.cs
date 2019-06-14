@@ -80,8 +80,8 @@ public class MainCamera : MonoBehaviour
         position.x = Mathf.Lerp(this.transform.position.x, player.transform.position.x, interpolation);
         position.z = -10.0f;
 
-        position.x = Mathf.Clamp(position.x, currentRoomCenterPoint.x + -(RoomLoader.ROOM_SIZE / 2) + camera.orthographicSize, currentRoomCenterPoint.x + (RoomLoader.ROOM_SIZE / 2) - camera.orthographicSize);
-        position.y = Mathf.Clamp(position.y, currentRoomCenterPoint.y + -(RoomLoader.ROOM_SIZE / 2) + camera.orthographicSize, currentRoomCenterPoint.y + (RoomLoader.ROOM_SIZE / 2) - camera.orthographicSize);
+        position.x = Mathf.Clamp(position.x, currentRoomCenterPoint.x + -(RoomLoader.ROOM_SIZE_LR / 2) + camera.orthographicSize, currentRoomCenterPoint.x + (RoomLoader.ROOM_SIZE_LR / 2) - camera.orthographicSize);
+        position.y = Mathf.Clamp(position.y, currentRoomCenterPoint.y + -(RoomLoader.ROOM_SIZE_UD / 2) + camera.orthographicSize, currentRoomCenterPoint.y + (RoomLoader.ROOM_SIZE_UD / 2) - camera.orthographicSize);
 
         this.transform.position = position;
     }

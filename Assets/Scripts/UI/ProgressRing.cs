@@ -20,7 +20,7 @@ public class ProgressRing : MonoBehaviour
 
     private void FixedUpdate()
     {
-        progressRing.transform.position = player.transform.position + new Vector3(0, 2, 0);
+        progressRing.transform.position = player.transform.position + new Vector3(0, 2.5f, 0);
     }
 
     public static void Use(float _value) {
