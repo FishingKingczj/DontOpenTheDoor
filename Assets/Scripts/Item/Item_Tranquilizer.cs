@@ -10,7 +10,7 @@ public class Item_Tranquilizer : Item
     {
         id = 4;
         name = "Tranquilizer";
-        description = "这是一瓶镇定剂,消除一个Debuff";
+        description = "Drink it, you will be like me.";
 
         pickable = true;
 

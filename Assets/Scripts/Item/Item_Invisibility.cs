@@ -11,7 +11,7 @@ public class Item_Invisibility : Item
     {
         id = 7;
         name = "Invisibility";
-        description = "这是一瓶隐形药水";
+        description = "Escape from the ancient god’s gaze is to escape death";
 
         pickable = true;
 

@@ -80,7 +80,7 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 1
+  m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!61 &382499723060473459
 BoxCollider2D:
@@ -127,6 +127,5 @@ MonoBehaviour:
   maxStorageAmount: 0
   usageTime: 0
   timer_UsageTime: 0
-  progressRing: {fileID: 0}
   triggerPosition: {fileID: 0}
   targetDoor: {fileID: 0}

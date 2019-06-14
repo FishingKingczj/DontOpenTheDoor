@@ -11,7 +11,7 @@ public class Item_Food : Item
     {
         id = 0;
         name = "Food";
-        description = "This is food to restore 10 Restore physical strength";
+        description = "A normal food made by humans hiding in the dungeon relying on only the light source.";
 
         pickable = true;
 

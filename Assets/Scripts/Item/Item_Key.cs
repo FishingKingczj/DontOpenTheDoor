@@ -14,7 +14,7 @@ public class Item_Key : Item
     {
         id = 1;
         name = "Key";
-        description = "这是个钥匙";
+        description = "Can lift the magic of blood and meat on specific gates";
 
         pickable = true;
 
@@ -22,8 +22,6 @@ public class Item_Key : Item
 
         usageTime = 2.0f;
         timer_UsageTime = usageTime;
-
-        pairingValue = 1;
     }
 
     public override void Effect(GameObject _user)
@@ -67,12 +65,12 @@ public class Item_Key : Item
                 {
                     if (!t.GetComponent<Item_Door>().Pair(pairingValue))
                     {
-                        Debug.Log("这钥匙不是开这里的");
+                        Dialog.ShowDialog("This key can't be used here");
                         return;
                     }
                     if (t.GetComponent<Item_Door>().inOpened)
                     {
-                        Debug.Log("门开着");
+                        Dialog.ShowDialog("This door is already open");
                         return;
                     }
 

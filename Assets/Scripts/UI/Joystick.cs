@@ -21,8 +21,9 @@ public class Joystick : ScrollRect
 
     public void FixedUpdate()
     {
+        /*
         if (player.GetInEscape()) {
-            // QTE测试用
+            //PC QTE测试用
             if (Input.GetKey(KeyCode.D))
             {
                 forceVector.x = 1;
@@ -33,10 +34,11 @@ public class Joystick : ScrollRect
             }
             else
                 forceVector.x = 0;
-
-
             return;
-        }
+        }*/
+
+        // 战斗状态不可移动
+        if (player.GetInEscape()) return;
 
         // 可控制状态下玩家进行操作
         if (controllable)

@@ -155,8 +155,9 @@ public class RoomLoader : MonoBehaviour
         playerRoom = room;
         // 激活房间
         ActiveRoom(room, target);
-        // 移动镜头
-        //mainCamera.Move(target);
+
+        InActiveRooms();
+        ActiveAroundRoom();
     }
 
     public Room GetPlayerRoom()

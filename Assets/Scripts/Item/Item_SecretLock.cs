@@ -17,8 +17,6 @@ public class Item_SecretLock : Item
 
         pickable = false;
 
-        //manager = GameObject.Find("SceneItem_SecretLock").GetComponent<Item_SecretLockManager>();
-
         if (key == -1) { Debug.LogWarning(this.gameObject.name + " 并未赋予Key值"); }
     }
 

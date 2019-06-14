@@ -48,9 +48,9 @@ public class Monster : MonoBehaviour
     }
     protected void DecisionLayer()
     {
-        Debug.Log(state.issueType);
-        Debug.Log(state.stateType);
-        Debug.Log(timer);
+        //Debug.Log(state.issueType);
+        //Debug.Log(state.stateType);
+        //Debug.Log(timer);
         if (state.issueType.Equals(MonsterState.canAttack) && !state.stateType.Equals(MonsterState.beforeAttack) && !state.stateType.Equals(MonsterState.attack) && !state.stateType.Equals(MonsterState.skill)) timer = -1.0f;
         if (state.issueType.Equals(MonsterState.seePlayer) && (state.stateType.Equals(MonsterState.hangOut)|| state.stateType.Equals(MonsterState.goBack))) {
             timer = -1.0f;
@@ -109,6 +109,7 @@ public class Monster : MonoBehaviour
         if (state.intentionType.Equals(MonsterState.walk))
         {
             anim.SetInteger("state", 0);
+            aimObject = GameObject.Find("player");
             autoMove((Vector2)aimObject.transform.position, monster_walkSpeed);
         }
         else if (state.intentionType.Equals(MonsterState.rush))
@@ -212,8 +213,9 @@ public class Monster : MonoBehaviour
     {
         birthposiotion = transform.localPosition + transform.parent.position;
 
-        Debug.Log(state.stateType);
-        Debug.Log(state.issueType);
+        //Debug.Log(state.stateType);
+        //Debug.Log(state.issueType);
+
         if (isBattle == "battle") {
             timer = 5.0f;
             return;

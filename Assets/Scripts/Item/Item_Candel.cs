@@ -8,7 +8,7 @@ public class Item_Candel : Item
     {
         id = 6;
         name = "Candel";
-        description = "This is a candel.";
+        description = "It is said to be an eternal burning candle, and its appearance also witnesses the complete degeneration of mankind.";
 
         pickable = true;
 

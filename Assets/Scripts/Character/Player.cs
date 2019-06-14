@@ -315,6 +315,10 @@ public class Player : MoveObject
 
         energy_Current = Mathf.Clamp(energy_Current, 0, DEFAULT_MAXENERGY);
         energy_Slider.value = energy_Current;
+
+        if (energy_Current <= 0) {
+            SceneManager.LoadScene(0);
+        }
     }
 
     // 玩家格挡
@@ -372,9 +376,9 @@ public class Player : MoveObject
 
             if (escapePoint <= 0)
             {
-                //Debug.Log("玩家死亡 逃生点 0");
-                //ExitEscapeMode();
-                //SceneManager.LoadScene(0);
+                Debug.Log("玩家死亡 逃生点 0");
+                ExitEscapeMode();
+                SceneManager.LoadScene(0);
             }
 
             else if (escapePoint >= 50) {

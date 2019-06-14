@@ -18,7 +18,7 @@ public class Buff_Invisibility : Buff
 
         Effect();
 
-        CreateBuffImage(id);
+        //CreateBuffImage(id);
     }
 
     // Update is called once per frame
@@ -30,16 +30,16 @@ public class Buff_Invisibility : Buff
     public override void Effect()
     {
         this.gameObject.tag = "Player_Inivisble";
-        Color c = this.gameObject.GetComponent<SpriteRenderer>().color;
+        Color c = this.gameObject.transform.Find("anim").GetComponent<SpriteRenderer>().color;
         c.a = 0.3f;
-        this.gameObject.GetComponent<SpriteRenderer>().color = c;
+        this.gameObject.transform.Find("anim").GetComponent<SpriteRenderer>().color = c;
     }
 
     public override void OnDestroy()
     {
         this.gameObject.tag = "Player";
-        Color c = this.gameObject.GetComponent<SpriteRenderer>().color;
+        Color c = this.gameObject.transform.Find("anim").GetComponent<SpriteRenderer>().color;
         c.a = 1.0f;
-        this.gameObject.GetComponent<SpriteRenderer>().color = c;
+        this.gameObject.transform.Find("anim").GetComponent<SpriteRenderer>().color = c;
     }
 }
