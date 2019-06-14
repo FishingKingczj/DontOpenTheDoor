@@ -209,8 +209,6 @@ public class Monster : MonoBehaviour
     {
         birthposiotion = transform.localPosition + transform.parent.position;
 
-        Debug.Log(isBattle);
-
         if (isBattle == "battle") {
             timer = 0.5f;
             return;
