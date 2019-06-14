@@ -71,10 +71,6 @@ public class Player_BackPack : MonoBehaviour
 
     void FixedUpdate()
     {
-
-        UseItem(); // Temp
-        ComposeItem(); // Temp
-
         #if UNITY_ANDROID
             UseItem(1); // 移动端(带任意整形参数) 电脑端(无参)
             ComposeItem(1);// 移动端(带任意整形参数) 电脑端(无参)
@@ -86,8 +82,8 @@ public class Player_BackPack : MonoBehaviour
         #if UNITY_STANDALONE_WIN
             UseItem();
             ComposeItem();
-            SelectItem();//移动端注释 电脑端保留
-            DiscardItem();//移动端注释 电脑端保留
+            SelectItem();
+            DiscardItem();
         #endif
     }
 

@@ -35,7 +35,7 @@ public class Buff_AuditoryHallucination : Buff
 
     public override void Effect()
     { 
-        string path = "Audio/Buff/AuditoryHallucination/Audio_" + Random.Range(1, 4).ToString(); // 此处Range最大值根据实际情况修改
+        string path = "Audio/Buff/AuditoryHallucination/Audio_" + Random.Range(1, 5).ToString(); // 此处Range最大值根据实际情况修改
         audio.clip = Resources.Load<AudioClip>(path);
         audio.Play();
     }

@@ -23,6 +23,7 @@ public class Item_SecretLockManager : MonoBehaviour
     // 重设
     public void Reset()
     {
+        Dialog.ShowDialog("Error,nothing happen");
         currentPasswordIndex = 0;
 
         for (int i = 0; i < secretLock.Count; i++)

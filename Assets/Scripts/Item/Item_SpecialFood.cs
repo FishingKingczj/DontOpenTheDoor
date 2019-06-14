@@ -12,7 +12,7 @@ public class Item_SpecialFood : Item
     {
         id = 8;
         name = "SpecialFood";
-        description = "Able to recover a lot of physical strength if you don't care about its materials";
+        description = "This food is made by alchemists using a raw material that people don't want to talk about.";
 
         pickable = true;
 

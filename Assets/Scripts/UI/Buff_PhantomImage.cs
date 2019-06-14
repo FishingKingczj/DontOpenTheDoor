@@ -15,7 +15,7 @@ public class Buff_PhantomImage : MonoBehaviour
         transform.position = new Vector3(Camera.main.pixelWidth / 2, Camera.main.pixelHeight / 2, 0);
         transform.SetParent(GameObject.Find("Canvas_UI").transform);
 
-        string path = "Image/Buff/Phantom/Image_" + Random.Range(1, 4).ToString();// 此处Range最大值根据实际情况修改
+        string path = "Image/Buff/Phantom/Image_" + Random.Range(1, 5).ToString();// 此处Range最大值根据实际情况修改
         image.sprite = Resources.Load<Sprite>(path);
 
         timer_Duration = duration;
