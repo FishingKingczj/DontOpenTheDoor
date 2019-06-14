@@ -48,7 +48,10 @@ public class Monster : MonoBehaviour
     }
     protected void DecisionLayer()
     {
-        if (state.issueType.Equals(MonsterState.canAttack) && !state.stateType.Equals(MonsterState.beforeAttack)) timer = -1.0f;
+        Debug.Log(state.issueType);
+        Debug.Log(state.stateType);
+        Debug.Log(timer);
+        if (state.issueType.Equals(MonsterState.canAttack) && !state.stateType.Equals(MonsterState.beforeAttack) && !state.stateType.Equals(MonsterState.attack) && !state.stateType.Equals(MonsterState.skill)) timer = -1.0f;
         if (state.issueType.Equals(MonsterState.seePlayer) && (state.stateType.Equals(MonsterState.hangOut)|| state.stateType.Equals(MonsterState.goBack))) {
             timer = -1.0f;
         }
@@ -209,14 +212,21 @@ public class Monster : MonoBehaviour
     {
         birthposiotion = transform.localPosition + transform.parent.position;
 
+        Debug.Log(state.stateType);
+        Debug.Log(state.issueType);
         if (isBattle == "battle") {
-            timer = 0.5f;
+            timer = 5.0f;
             return;
         }
 
         if (isBattle == "afterBattle") {
-            if (timer < 0) isBattle = "notBattle";
             timer -= Time.deltaTime;
+            if (timer < 0) {
+                isBattle = "notBattle";
+                state.issueType = "seeNothing";
+                state.stateType = "hangOut";
+            }
+                
             return;
         }
 

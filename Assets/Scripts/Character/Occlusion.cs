@@ -6,17 +6,20 @@ public class Occlusion : MonoBehaviour
 {
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.tag.Contains("NPC") || collision.tag.Contains("Item_Collision"))
+        if (collision.name == "前景墙") {
+            collision.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
+        }
+        else if (collision.tag.Contains("NPC") || collision.tag.Contains("Item_Collision"))
         {
             if (collision.transform.position.y < this.transform.position.y)
             {
                 collision.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 0.5f);
             }
             else {
-                /*if (collision.GetComponent<SpriteRenderer>().sortingLayerName.Equals("BBeforePlayer"))
-                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "AfterPlayer";
+                if (collision.GetComponent<SpriteRenderer>().sortingLayerName.Equals("BeforePlayer"))
+                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "AAfterPlayer";
                 else
-                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "AAfterPlayer";*/
+                    collision.GetComponent<SpriteRenderer>().sortingLayerName = "AfterPlayer";
             }
 
             
@@ -26,10 +29,11 @@ public class Occlusion : MonoBehaviour
     {
         if (collision.tag.Contains("NPC") || collision.tag.Contains("Item_Collision"))
         {
-            /*if (collision.GetComponent<SpriteRenderer>().sortingLayerName.Equals("AfterPlayer"))
+            collision.GetComponent<SpriteRenderer>().color = new Color(1f, 1f, 1f, 1f);
+            if (collision.GetComponent<SpriteRenderer>().sortingLayerName.Equals("AfterPlayer"))
                 collision.GetComponent<SpriteRenderer>().sortingLayerName = "BBeforePlayer";
             else
-                collision.GetComponent<SpriteRenderer>().sortingLayerName = "BeforePlayer";*/
+                collision.GetComponent<SpriteRenderer>().sortingLayerName = "BeforePlayer";
         }
     }
 }
